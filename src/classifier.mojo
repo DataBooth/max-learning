@@ -8,7 +8,7 @@ MVP v0.1.0 - No external model files required.
 from logger import Logger, Level
 
 
-struct SentimentResult:
+struct SentimentResult(Copyable, Movable):
     """Result from sentiment classification."""
     var label: String  # "POSITIVE" or "NEGATIVE"
     var confidence: Float64  # 0.0 to 1.0
@@ -20,7 +20,7 @@ struct SentimentResult:
         self.score = score
 
 
-struct SentimentClassifier:
+struct SentimentClassifier(Copyable, Movable):
     """
     Simple sentiment classifier using word-based scoring.
     

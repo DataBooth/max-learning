@@ -13,7 +13,7 @@ from logger import Logger, Level
 # from dotenv import dotenv_values
 
 
-struct ModelConfig:
+struct ModelConfig(Copyable, Movable):
     """Configuration for the ML model."""
     var type: String
     var algorithm: String
@@ -25,9 +25,12 @@ struct ModelConfig:
         self.algorithm = algorithm
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
+    
+    fn copy(self) -> Self:
+        return ModelConfig(self.type, self.algorithm, self.vocab_size, self.embedding_dim)
 
 
-struct InferenceConfig:
+struct InferenceConfig(Copyable, Movable):
     """Configuration for inference settings."""
     var confidence_threshold: Float64
     var max_length: Int
@@ -35,17 +38,23 @@ struct InferenceConfig:
     fn __init__(out self, confidence_threshold: Float64, max_length: Int):
         self.confidence_threshold = confidence_threshold
         self.max_length = max_length
+    
+    fn copy(self) -> Self:
+        return InferenceConfig(self.confidence_threshold, self.max_length)
 
 
-struct LoggingConfig:
+struct LoggingConfig(Copyable, Movable):
     """Configuration for logging."""
     var level: String
     
     fn __init__(out self, level: String):
         self.level = level
+    
+    fn copy(self) -> Self:
+        return LoggingConfig(self.level)
 
 
-struct ServerConfig:
+struct ServerConfig(Copyable, Movable):
     """Configuration for HTTP server (future)."""
     var host: String
     var port: Int
@@ -55,9 +64,12 @@ struct ServerConfig:
         self.host = host
         self.port = port
         self.workers = workers
+    
+    fn copy(self) -> Self:
+        return ServerConfig(self.host, self.port, self.workers)
 
 
-struct AppConfig:
+struct AppConfig(Copyable, Movable):
     """Complete application configuration."""
     var model: ModelConfig
     var inference: InferenceConfig
@@ -65,13 +77,13 @@ struct AppConfig:
     var server: ServerConfig
     
     fn __init__(out self, model: ModelConfig, inference: InferenceConfig, logging: LoggingConfig, server: ServerConfig):
-        self.model = model
-        self.inference = inference
-        self.logging = logging
-        self.server = server
+        self.model = model.copy()
+        self.inference = inference.copy()
+        self.logging = logging.copy()
+        self.server = server.copy()
 
 
-struct Secrets:
+struct Secrets(Copyable, Movable):
     """Secrets loaded from .env file."""
     var huggingface_api_key: String
     var auth_token: String
