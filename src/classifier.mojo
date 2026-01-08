@@ -14,7 +14,7 @@ struct SentimentResult:
     var confidence: Float64  # 0.0 to 1.0
     var score: Float64  # Raw sentiment score
     
-    fn __init__(inout self, label: String, confidence: Float64, score: Float64):
+    fn __init__(out self, label: String, confidence: Float64, score: Float64):
         self.label = label
         self.confidence = confidence
         self.score = score
@@ -36,12 +36,12 @@ struct SentimentClassifier:
     var max_length: Int
     var loaded: Bool
     
-    fn __init__(inout self, confidence_threshold: Float64 = 0.5, max_length: Int = 512):
+    fn __init__(out self, confidence_threshold: Float64, max_length: Int):
         self.confidence_threshold = confidence_threshold
         self.max_length = max_length
         self.loaded = False
     
-    fn load(inout self) raises:
+    fn load(mut self) raises:
         """
         Load the classifier (initialize sentiment lexicon).
         

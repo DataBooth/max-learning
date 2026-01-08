@@ -1,19 +1,19 @@
-[project]
-name = "mojo-inference-service"
-version = "0.1.0"
-description = "High-performance AI model inference service built in Mojo"
+[workspace]
 authors = ["Michael Booth <michael@databooth.com.au>"]
 channels = ["conda-forge", "https://conda.modular.com/max-nightly"]
-platforms = ["osx-arm64", "osx-64", "linux-64"]
+name = "mojo-inference-service"
+platforms = ["osx-arm64", "linux-64"]
+version = "0.1.0"
 
 [dependencies]
-max = ">=25.1.0,<26"
+mojo = "*"
 
 [tasks]
 # Development tasks
 build = "mojo build src/main.mojo -o inference-service"
-run = "mojo run src/main.mojo"
+start = "mojo run src/main.mojo"
 inference = "mojo run src/main.mojo"
+mojo-version = "mojo --version"
 
 # Testing tasks
 test = "mojo test tests/"
