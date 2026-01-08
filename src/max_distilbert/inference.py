@@ -88,7 +88,7 @@ class DistilBertSentimentClassifier:
         # Create inference session and load model
         print("Compiling graph with MAX Engine...")
         session = InferenceSession(devices=[self.device])
-        self.model = session.load(graph)
+        self.model = session.load(graph, weights_registry=self.weights.allocated_weights)
         
         print("Model loaded successfully!")
         
@@ -125,6 +125,9 @@ class DistilBertSentimentClassifier:
         outputs = self.model.execute(input_ids, attention_mask)
         logits = outputs[0].to_numpy()
         
+        # Debug: print logits
+        print(f"  DEBUG: Raw logits: {logits[0]}")
+        
         # Apply softmax to get probabilities
         exp_logits = np.exp(logits - np.max(logits, axis=-1, keepdims=True))
         probs = exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
@@ -133,7 +136,7 @@ class DistilBertSentimentClassifier:
         predicted_class = int(np.argmax(probs, axis=-1)[0])
         confidence = float(probs[0, predicted_class])
         
-        label = self.id2label[str(predicted_class)]
+        label = self.id2label[predicted_class]
         negative_score = float(probs[0, 0])
         positive_score = float(probs[0, 1])
         
