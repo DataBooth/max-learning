@@ -49,7 +49,7 @@ fn tokenize(text: String) -> List[String]:
     return tokens^
 
 
-fn load_sentiment_lexicon(path: String = "data/sentiment_lexicon.txt") raises -> Dict[String, Float64]:
+fn load_sentiment_lexicon(path: String = "data/mvp/sentiment_lexicon.txt") raises -> Dict[String, Float64]:
     """
     Load sentiment lexicon from file.
     
@@ -66,45 +66,39 @@ fn load_sentiment_lexicon(path: String = "data/sentiment_lexicon.txt") raises ->
         word score
         happy 0.9
         sad -0.8
+        # comment (lines starting with # are ignored)
     """
     var log = Logger[Level.INFO]()
-    log.info("Loading sentiment lexicon...")
+    log.info("Loading sentiment lexicon from", path)
     
-    # For MVP, create hardcoded lexicon with common sentiment words
     var lexicon = Dict[String, Float64]()
     
-    # Positive words
-    lexicon["good"] = 0.8
-    lexicon["great"] = 0.9
-    lexicon["excellent"] = 0.95
-    lexicon["amazing"] = 0.95
-    lexicon["wonderful"] = 0.9
-    lexicon["fantastic"] = 0.9
-    lexicon["love"] = 0.9
-    lexicon["best"] = 0.85
-    lexicon["awesome"] = 0.9
-    lexicon["perfect"] = 0.95
-    lexicon["brilliant"] = 0.85
-    lexicon["beautiful"] = 0.8
-    lexicon["happy"] = 0.8
-    lexicon["enjoy"] = 0.7
-    lexicon["nice"] = 0.6
+    # Read the file
+    var content: String
+    with open(path, "r") as f:
+        content = f.read()
     
-    # Negative words
-    lexicon["bad"] = -0.8
-    lexicon["terrible"] = -0.9
-    lexicon["awful"] = -0.9
-    lexicon["horrible"] = -0.9
-    lexicon["worst"] = -0.95
-    lexicon["hate"] = -0.9
-    lexicon["poor"] = -0.7
-    lexicon["disappointing"] = -0.75
-    lexicon["disappointed"] = -0.75
-    lexicon["useless"] = -0.85
-    lexicon["waste"] = -0.8
-    lexicon["sad"] = -0.7
-    lexicon["boring"] = -0.6
-    lexicon["annoying"] = -0.7
+    # Parse line by line
+    var lines = content.split("\n")
+    
+    for i in range(len(lines)):
+        var line = lines[i].strip()
+        
+        # Skip empty lines and comments
+        if len(line) == 0 or line[0] == '#':
+            continue
+        
+        # Split on whitespace (space or tab)
+        var parts = line.split()
+        if len(parts) >= 2:
+            var word = String(parts[0])
+            try:
+                var score = Float64(atof(parts[1]))
+                lexicon.__setitem__(word, score)
+            except:
+                # Skip lines that can't be parsed
+                log.info("Warning: Failed to parse line:", line)
+                pass
     
     log.info("Loaded", len(lexicon), "sentiment words")
     return lexicon^

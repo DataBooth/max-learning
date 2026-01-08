@@ -3,6 +3,10 @@
 
 # Data files (embeddings, training data)
 data/
+# But allow lexicon files and READMEs
+!data/*/
+!data/*/README.md
+!data/*/*.txt
 *.npy
 *.vec
 *.bin
