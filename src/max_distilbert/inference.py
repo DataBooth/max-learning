@@ -125,8 +125,9 @@ class DistilBertSentimentClassifier:
         outputs = self.model.execute(input_ids, attention_mask)
         logits = outputs[0].to_numpy()
         
-        # Debug: print logits
+        # Debug: print logits and first few values
         print(f"  DEBUG: Raw logits: {logits[0]}")
+        print(f"  DEBUG: Input shape: {input_ids.shape}, mask shape: {attention_mask.shape}")
         
         # Apply softmax to get probabilities
         exp_logits = np.exp(logits - np.max(logits, axis=-1, keepdims=True))

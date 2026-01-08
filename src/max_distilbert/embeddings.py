@@ -28,22 +28,20 @@ class DistilBertEmbeddings(Module):
         
         # Word embeddings
         self.word_embeddings = weights.word_embeddings.weight.allocate(
-            DType.float32,
-            [config.vocab_size, config.hidden_size],
+            DType.float32
         ).cast(dtype)
         
         # Position embeddings
         self.position_embeddings = weights.position_embeddings.weight.allocate(
-            DType.float32,
-            [config.max_position_embeddings, config.hidden_size],
+            DType.float32
         ).cast(dtype)
         
         # LayerNorm
         self.LayerNorm_weight = weights.LayerNorm.weight.allocate(
-            DType.float32, [config.hidden_size]
+            DType.float32
         ).cast(dtype)
         self.LayerNorm_bias = weights.LayerNorm.bias.allocate(
-            DType.float32, [config.hidden_size]
+            DType.float32
         ).cast(dtype)
         
         self.layer_norm_eps = config.layer_norm_eps if hasattr(config, 'layer_norm_eps') else 1e-12
