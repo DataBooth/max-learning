@@ -22,10 +22,31 @@ fn tokenize(text: String) -> List[String]:
         MVP implementation: Basic whitespace splitting and lowercasing.
         Future: Handle punctuation, contractions, special characters.
     """
-    # TODO: Implement proper tokenization
-    # For now, return placeholder
     var tokens = List[String]()
-    return tokens
+    
+    # Convert to lowercase
+    var lower_text = text.lower()
+    
+    # Simple split on whitespace and common punctuation
+    var current_word = String("")
+    
+    for i in range(len(lower_text)):
+        var c = lower_text[i]
+        
+        # Check if it's a letter or number
+        if (c >= 'a' and c <= 'z') or (c >= '0' and c <= '9'):
+            current_word += c
+        else:
+            # End of word
+            if len(current_word) > 0:
+                tokens.append(current_word)
+                current_word = String("")
+    
+    # Add last word if exists
+    if len(current_word) > 0:
+        tokens.append(current_word)
+    
+    return tokens^
 
 
 fn load_sentiment_lexicon(path: String = "data/sentiment_lexicon.txt") raises -> Dict[String, Float64]:
@@ -47,24 +68,49 @@ fn load_sentiment_lexicon(path: String = "data/sentiment_lexicon.txt") raises ->
         sad -0.8
     """
     var log = Logger[Level.INFO]()
-    log.info("Loading sentiment lexicon from:", path)
+    log.info("Loading sentiment lexicon...")
     
-    # TODO: Implement file reading and parsing
-    # For MVP, create hardcoded lexicon
+    # For MVP, create hardcoded lexicon with common sentiment words
     var lexicon = Dict[String, Float64]()
     
-    # Placeholder: Add some common sentiment words
-    # lexicon["good"] = 0.8
-    # lexicon["bad"] = -0.8
-    # lexicon["love"] = 0.9
-    # lexicon["hate"] = -0.9
-    # ... etc
+    # Positive words
+    lexicon["good"] = 0.8
+    lexicon["great"] = 0.9
+    lexicon["excellent"] = 0.95
+    lexicon["amazing"] = 0.95
+    lexicon["wonderful"] = 0.9
+    lexicon["fantastic"] = 0.9
+    lexicon["love"] = 0.9
+    lexicon["best"] = 0.85
+    lexicon["awesome"] = 0.9
+    lexicon["perfect"] = 0.95
+    lexicon["brilliant"] = 0.85
+    lexicon["beautiful"] = 0.8
+    lexicon["happy"] = 0.8
+    lexicon["enjoy"] = 0.7
+    lexicon["nice"] = 0.6
     
-    log.info("Loaded sentiment lexicon")
-    return lexicon
+    # Negative words
+    lexicon["bad"] = -0.8
+    lexicon["terrible"] = -0.9
+    lexicon["awful"] = -0.9
+    lexicon["horrible"] = -0.9
+    lexicon["worst"] = -0.95
+    lexicon["hate"] = -0.9
+    lexicon["poor"] = -0.7
+    lexicon["disappointing"] = -0.75
+    lexicon["disappointed"] = -0.75
+    lexicon["useless"] = -0.85
+    lexicon["waste"] = -0.8
+    lexicon["sad"] = -0.7
+    lexicon["boring"] = -0.6
+    lexicon["annoying"] = -0.7
+    
+    log.info("Loaded", len(lexicon), "sentiment words")
+    return lexicon^
 
 
-fn get_word_sentiment(word: String, lexicon: Dict[String, Float64]) -> Float64:
+fn get_word_sentiment(word: String, lexicon: Dict[String, Float64]) raises -> Float64:
     """
     Get sentiment score for a word.
     
@@ -75,13 +121,15 @@ fn get_word_sentiment(word: String, lexicon: Dict[String, Float64]) -> Float64:
     Returns:
         Sentiment score (0.0 if word not in lexicon).
     """
-    # TODO: Implement lookup
-    # if word in lexicon:
-    #     return lexicon[word]
+    if word in lexicon:
+        try:
+            return lexicon[word]
+        except:
+            return 0.0
     return 0.0
 
 
-fn compute_text_sentiment(tokens: List[String], lexicon: Dict[String, Float64]) -> Float64:
+fn compute_text_sentiment(tokens: List[String], lexicon: Dict[String, Float64]) raises -> Float64:
     """
     Compute overall sentiment score for text.
     
@@ -96,15 +144,16 @@ fn compute_text_sentiment(tokens: List[String], lexicon: Dict[String, Float64]) 
         MVP: Simple average of word sentiments.
         Future: Weighted averaging, negation handling, etc.
     """
-    # TODO: Implement sentiment aggregation
-    # total_score = 0.0
-    # count = 0
-    # for token in tokens:
-    #     score = get_word_sentiment(token, lexicon)
-    #     if score != 0.0:
-    #         total_score += score
-    #         count += 1
-    # 
-    # if count > 0:
-    #     return total_score / count
+    var total_score = 0.0
+    var count = 0
+    
+    for i in range(len(tokens)):
+        var score = get_word_sentiment(tokens[i], lexicon)
+        if score != 0.0:
+            total_score += score
+            count += 1
+    
+    if count > 0:
+        return total_score / Float64(count)
+    
     return 0.0

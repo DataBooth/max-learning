@@ -6,6 +6,8 @@ MVP v0.1.0 - No external model files required.
 """
 
 from logger import Logger, Level
+from math import exp
+from embeddings import tokenize, load_sentiment_lexicon, compute_text_sentiment
 
 
 struct SentimentResult(Copyable, Movable):
@@ -35,11 +37,13 @@ struct SentimentClassifier(Copyable, Movable):
     var confidence_threshold: Float64
     var max_length: Int
     var loaded: Bool
+    var lexicon: Dict[String, Float64]
     
     fn __init__(out self, confidence_threshold: Float64, max_length: Int):
         self.confidence_threshold = confidence_threshold
         self.max_length = max_length
         self.loaded = False
+        self.lexicon = Dict[String, Float64]()
     
     fn load(mut self) raises:
         """
@@ -51,10 +55,10 @@ struct SentimentClassifier(Copyable, Movable):
         var log = Logger[Level.INFO]()
         log.info("Loading sentiment classifier...")
         
-        # TODO: Load sentiment lexicon from data/sentiment_lexicon.txt
-        # For now, mark as loaded
-        self.loaded = True
+        # Load sentiment lexicon
+        self.lexicon = load_sentiment_lexicon()
         
+        self.loaded = True
         log.info("Classifier loaded successfully")
     
     fn predict(self, input_text: String) raises -> SentimentResult:
@@ -76,16 +80,28 @@ struct SentimentClassifier(Copyable, Movable):
         var log = Logger[Level.DEBUG]()
         log.debug("Classifying text:", input_text)
         
-        # TODO: Implement actual classification
         # 1. Tokenize input
-        # 2. Look up word sentiments
-        # 3. Aggregate scores
-        # 4. Apply threshold
+        var tokens = tokenize(input_text)
+        log.debug("Tokens:", len(tokens))
         
-        # Placeholder: Return dummy result
-        var score = 0.0
-        var label = "NEUTRAL"
-        var confidence = 0.5
+        # 2. Compute sentiment score
+        var score = compute_text_sentiment(tokens, self.lexicon)
+        log.debug("Raw score:", score)
+        
+        # 3. Determine label based on score
+        var label: String
+        if score > 0.1:
+            label = "POSITIVE"
+        elif score < -0.1:
+            label = "NEGATIVE"
+        else:
+            label = "NEUTRAL"
+        
+        # 4. Calculate confidence using sigmoid
+        # Map score to confidence: larger absolute scores = higher confidence
+        var abs_score = score if score > 0.0 else -score
+        var scaled_score = abs_score * 3.0  # Scale factor for sensitivity
+        var confidence = 1.0 / (1.0 + exp(-scaled_score))  # Sigmoid
         
         return SentimentResult(label, confidence, score)
 
