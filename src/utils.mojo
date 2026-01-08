@@ -3,6 +3,7 @@ Utility functions for the inference service.
 """
 
 from logger import Logger, Level
+from math import exp
 
 
 fn sigmoid(x: Float64) -> Float64:
@@ -15,9 +16,7 @@ fn sigmoid(x: Float64) -> Float64:
     Returns:
         Sigmoid(x) in range (0, 1).
     """
-    # TODO: Implement sigmoid
-    # return 1.0 / (1.0 + exp(-x))
-    return 0.5  # Placeholder
+    return 1.0 / (1.0 + exp(-x))
 
 
 fn normalize_text(text: String) -> String:
