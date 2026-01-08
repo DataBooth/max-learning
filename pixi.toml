@@ -1,0 +1,31 @@
+[project]
+name = "mojo-inference-service"
+version = "0.1.0"
+description = "High-performance AI model inference service built in Mojo"
+authors = ["Michael Booth <michael@databooth.com.au>"]
+channels = ["conda-forge", "https://conda.modular.com/max-nightly"]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+
+[dependencies]
+max = ">=25.1.0,<26"
+
+[tasks]
+# Development tasks
+build = "mojo build src/main.mojo -o inference-service"
+run = "mojo run src/main.mojo"
+inference = "mojo run src/main.mojo"
+
+# Testing tasks
+test = "mojo test tests/"
+test-config = "mojo test tests/test_config.mojo"
+test-classifier = "mojo test tests/test_classifier.mojo"
+
+# Examples
+example = "mojo run examples/example_inference.mojo"
+
+# Linting and formatting
+format = "mojo format src/ tests/ examples/"
+check = "mojo check src/ tests/ examples/"
+
+# Benchmarking (future)
+# bench = "mojo run benchmarks/compare_python.mojo"

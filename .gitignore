@@ -1,0 +1,50 @@
+# Secrets and environment
+.env
+
+# Data files (embeddings, training data)
+data/
+*.npy
+*.vec
+*.bin
+
+# Future: Model files (for v0.2.0+ with MAX)
+*.onnx
+*.pt
+*.pth
+*.pb
+*.h5
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+inference-service
+__pycache__/
+*.pyc
+
+# Pixi
+.pixi/
+pixi.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Benchmarks output
+benchmarks/results/
