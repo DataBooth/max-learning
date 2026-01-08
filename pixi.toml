@@ -5,14 +5,17 @@ name = "mojo-inference-service"
 platforms = ["osx-arm64", "linux-64"]
 version = "0.1.0"
 
+[activation]
+env = { MOJO_PATH = "$PIXI_PROJECT_ROOT/src:$HOME/code/github/databooth/mojo-toml/src:$HOME/code/github/databooth/mojo-dotenv/src" }
+
 [dependencies]
 mojo = "*"
 
 [tasks]
 # Development tasks
-build = "mojo build src/main.mojo -o inference-service"
-start = "mojo run src/main.mojo"
-inference = "mojo run src/main.mojo"
+build = "mojo build -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/github/databooth/mojo-dotenv/src src/main.mojo -o inference-service"
+start = "mojo run -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/github/databooth/mojo-dotenv/src src/main.mojo"
+inference = "mojo run -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/github/databooth/mojo-dotenv/src src/main.mojo"
 mojo-version = "mojo --version"
 
 # Testing tasks

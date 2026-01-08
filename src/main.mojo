@@ -38,6 +38,10 @@ fn main() raises:
     # Load secrets
     var secrets = load_secrets(".env")
     startup_log.info("✅ Secrets loaded")
+    if len(secrets.huggingface_api_key) > 0:
+        startup_log.info("  HuggingFace API key: [REDACTED]")
+    if len(secrets.auth_token) > 0:
+        startup_log.info("  Auth token: [REDACTED]")
     
     # Configure logger based on config
     # TODO: Create logger with config.logging.level
