@@ -1,0 +1,39 @@
+# MVP Sentiment Lexicon
+# Format: word score
+# Score range: -1.0 (most negative) to 1.0 (most positive)
+# 
+# Manually curated for mojo-inference-service v0.1.0
+# Total: 29 words (15 positive, 14 negative)
+
+# Positive words (15)
+amazing 0.95
+excellent 0.95
+perfect 0.95
+fantastic 0.9
+wonderful 0.9
+awesome 0.9
+love 0.9
+great 0.9
+brilliant 0.85
+best 0.85
+good 0.8
+beautiful 0.8
+happy 0.8
+enjoy 0.7
+nice 0.6
+
+# Negative words (14)
+worst -0.95
+terrible -0.9
+awful -0.9
+horrible -0.9
+hate -0.9
+useless -0.85
+bad -0.8
+waste -0.8
+disappointing -0.75
+disappointed -0.75
+poor -0.7
+annoying -0.7
+sad -0.7
+boring -0.6
