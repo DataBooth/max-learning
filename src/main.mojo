@@ -5,9 +5,9 @@ Entry point for the inference service application.
 """
 
 from logger import Logger, Level
-from sys import argv
 from config import load_config, load_secrets
-from classifier import SentimentClassifier
+from classifier import SentimentClassifier, classify_sentiment
+from cli import parse_args, print_help
 
 
 fn parse_level(level_str: String) -> Level:
@@ -26,8 +26,18 @@ fn main() raises:
     startup_log.info("🔥 mojo-inference-service v0.1.0-dev")
     startup_log.info("Starting up...")
     
+    # Parse command-line arguments
+    var cli_args = parse_args()
+    
+    # Show help if requested
+    if cli_args.help_requested:
+        print_help()
+        return
+    
+    startup_log.info("Input text:", cli_args.text)
+    
     # Load configuration
-    var config = load_config("config.toml")
+    var config = load_config(cli_args.config_path)
     startup_log.info("✅ Configuration loaded")
     startup_log.info("  Model type:", config.model.type)
     startup_log.info("  Algorithm:", config.model.algorithm)
@@ -44,20 +54,7 @@ fn main() raises:
         startup_log.info("  Auth token: [REDACTED]")
     
     # Configure logger based on config
-    # TODO: Create logger with config.logging.level
     var log = Logger[Level.INFO]()
-    
-    # Parse command-line arguments
-    var args = argv()
-    if len(args) > 1:
-        var arg_count = len(args) - 1
-        log.info("Arguments received:", arg_count)
-        for i in range(1, len(args)):
-            log.debug("  Arg", i, ":", args[i])
-    else:
-        log.warning("No arguments provided.")
-        log.info("Usage: pixi run inference --text 'Your text here'")
-        return
     
     # Initialize classifier
     log.info("Initializing classifier...")
@@ -68,8 +65,20 @@ fn main() raises:
     classifier.load()
     log.info("✅ Classifier ready")
     
-    # TODO: Parse --text argument and run inference
-    # For now, just indicate we're ready
-    log.info("✅ Initialization complete. Ready for inference.")
-    log.warning("⚠️  CLI argument parsing not yet implemented")
-    log.info("Next: Implement --text argument parsing and run classification")
+    # Run inference
+    log.info("Running inference...")
+    var result = classify_sentiment(classifier, cli_args.text)
+    
+    # Display results
+    print("")
+    print("═" * 50)
+    print("SENTIMENT ANALYSIS RESULT")
+    print("═" * 50)
+    print("Input:", cli_args.text)
+    print("")
+    print("Label:", result.label)
+    print("Confidence:", result.confidence)
+    print("Score:", result.score)
+    print("═" * 50)
+    
+    log.info("✅ Inference complete")
