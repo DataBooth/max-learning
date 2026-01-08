@@ -7,10 +7,8 @@ mojo-toml and mojo-dotenv libraries.
 
 from pathlib import Path
 from logger import Logger, Level
-
-# TODO: Once published to pixi, change to: from toml import parse
-# For now, we'll implement a simple parser or use file reading
-# from dotenv import dotenv_values
+from toml import parse
+from dotenv import dotenv_values
 
 
 struct ModelConfig(Copyable, Movable):
@@ -117,31 +115,34 @@ fn load_config(config_path: String = "config.toml") raises -> AppConfig:
     # Read file content
     var content = path.read_text()
     
-    # TODO: Use mojo-toml parse() once we set up imports
-    # For now, we'll create a config with defaults and note it's a placeholder
-    # var toml_data = parse(content)
+    # Parse TOML
+    var toml_data = parse(content)
     
-    log.warning("⚠️  Using default configuration (TOML parsing not yet integrated)")
+    log.info("✅ TOML parsed successfully")
     
-    # Create default configuration matching config.toml
+    # Extract configuration from parsed TOML
+    var model_table = toml_data["model"].as_table()
     var model = ModelConfig(
-        type="sentiment-analysis",
-        algorithm="logistic-regression",
-        vocab_size=10000,
-        embedding_dim=100
+        type=model_table["type"].as_string(),
+        algorithm=model_table["algorithm"].as_string(),
+        vocab_size=model_table["vocab_size"].as_int(),
+        embedding_dim=model_table["embedding_dim"].as_int()
     )
     
+    var inference_table = toml_data["inference"].as_table()
     var inference = InferenceConfig(
-        confidence_threshold=0.5,
-        max_length=512
+        confidence_threshold=inference_table["confidence_threshold"].as_float(),
+        max_length=inference_table["max_length"].as_int()
     )
     
-    var logging = LoggingConfig(level="INFO")
+    var logging_table = toml_data["logging"].as_table()
+    var logging = LoggingConfig(level=logging_table["level"].as_string())
     
+    var server_table = toml_data["server"].as_table()
     var server = ServerConfig(
-        host="0.0.0.0",
-        port=8080,
-        workers=4
+        host=server_table["host"].as_string(),
+        port=server_table["port"].as_int(),
+        workers=server_table["workers"].as_int()
     )
     
     return AppConfig(model, inference, logging, server)
@@ -172,15 +173,16 @@ fn load_secrets(env_path: String = ".env") raises -> Secrets:
             auth_token=""
         )
     
-    # TODO: Use mojo-dotenv dotenv_values() once we set up imports
-    # For now, return empty secrets
-    # var env_vars = dotenv_values(env_path)
-    # var hf_key = env_vars.get("HUGGINGFACE_API_KEY", "")
-    # var auth = env_vars.get("AUTH_TOKEN", "")
+    # Load environment variables from .env file
+    var env_vars = dotenv_values(env_path)
     
-    log.warning("⚠️  Using empty secrets (.env parsing not yet integrated)")
+    # Extract secrets with defaults
+    var hf_key = env_vars.get("HUGGINGFACE_API_KEY", "")
+    var auth = env_vars.get("AUTH_TOKEN", "")
+    
+    log.info("✅ .env parsed successfully")
     
     return Secrets(
-        huggingface_api_key="",
-        auth_token=""
+        huggingface_api_key=hf_key,
+        auth_token=auth
     )
