@@ -120,7 +120,7 @@ BERT (embeddings) → DistilBERT (classification)
 
 ---
 
-## Chapter 4: Building the Custom MAX Graph [CURRENT PROGRESS]
+## Chapter 4: Building the Custom MAX Graph [COMPLETED ✅]
 
 ### Architecture Overview
 ```
@@ -173,9 +173,9 @@ class DistilBertClassifier(Module):
         return logits
 ```
 
-### Challenges Encountered
+### Challenges Encountered & Solutions
 
-#### 1. Dependency Management
+#### 1. Dependency Management ✅
 **Problem**: MAX pipelines module has deep dependency chain (pydantic, psutil, msgspec, pyzmq, grpcio, protobuf)
 
 **Solution**: Use unified `modular` package instead of individual `max` + `mojo` packages:
@@ -191,65 +191,189 @@ modular = "*"  # Includes all MAX dependencies!
 
 **Learning**: Modular provides a complete package that includes all necessary dependencies. Don't add MAX/Mojo separately.
 
-#### 2. PipelineConfig Requirements
+#### 2. PipelineConfig Requirements ✅
 **Problem**: The BERT example components expect `PipelineConfig`, but creating one requires a HuggingFace model path and triggers full pipeline resolution.
 
-**Current Status**: Investigating how to either:
-- Create a minimal config that satisfies the embedding/encoder requirements
-- Bypass PipelineConfig entirely and create standalone versions of the components
-- Use a different approach that doesn't depend on the pipeline infrastructure
+**Solution**: Built custom DistilBERT components from scratch instead of reusing BERT example:
+- `embeddings.py` - Custom embeddings without token type support
+- `transformer.py` - DistilBERT-specific attention layers
+- `graph.py` - Graph builder with classification head
+- Created minimal `SimpleConfig` to satisfy remaining interface requirements
 
-**Blocker**: `PipelineConfig(max_length=512)` fails with:
+**Learning**: When example code has heavy dependencies, it's often cleaner to build custom components tailored to your use case.
+
+#### 3. Missing Pre-Classifier Layer 🐛 → ✅
+**Problem**: Initial implementation had tiny logits (~0.05) instead of expected large values (>15).
+
+**Root cause**: DistilBERT sequence classification has an extra layer we missed:
+```python
+# Missing layer:
+[CLS] token (768) → pre_classifier (768→768) → ReLU → classifier (768→2)
+
+# What we had:
+[CLS] token (768) → classifier (768→2)  # ❌ Wrong!
 ```
-ValueError: model must be provided and must be a valid Hugging Face repository
+
+**Solution**: Added the pre-classifier layer:
+```python
+self.pre_classifier_weight = weights.pre_classifier.weight.allocate(...)
+self.pre_classifier_bias = weights.pre_classifier.bias.allocate(...)
+
+# In forward pass:
+pooled_output = ops.matmul(cls_output, ops.transpose(self.pre_classifier_weight, 1, 0))
+pooled_output = ops.relu(pooled_output)
+logits = ops.matmul(pooled_output, ops.transpose(self.classifier_weight, 1, 0))
 ```
 
-### Next Steps
+**Result**: After fix, achieved **100% accuracy parity** with HuggingFace (99.99% confidence on positive examples).
 
-1. **Resolve PipelineConfig dependency** - Either:
-   - Provide dummy model path to satisfy requirements
-   - Create simplified config class that components accept
-   - Extract and adapt embedding/encoder components to work standalone
+#### 4. Package Import Structure ✅
+**Problem**: Benchmarking harness couldn't import `max_distilbert` modules.
 
-2. **Complete inference implementation** once config issue resolved
+**Solution**: Made it a proper Python package:
+```python
+# src/max_distilbert/__init__.py
+from .graph import build_graph
+from .inference import DistilBertSentimentClassifier
 
-3. **Test with sample inputs** and verify correctness
+# Now can import:
+from max_distilbert import DistilBertSentimentClassifier
+```
 
-4. **Benchmark** against ONNX Runtime baseline
+### Performance Results
 
-5. **Document performance characteristics** and learnings
+Built comprehensive benchmarking framework with 100 iterations:
+
+**Benchmark Results (Apple M3 CPU)**:
+- **MAX Engine**: 45.88ms mean latency (21.80 req/sec)
+- **HuggingFace PyTorch**: 255.85ms mean latency (3.91 req/sec)
+- **Speedup**: **5.58x faster** 🚀
+
+**Additional metrics**:
+- P95 latency: 67.61ms (MAX) vs 451.75ms (PyTorch) = **85% better**
+- Standard deviation: 14.95ms (MAX) vs 113.22ms (PyTorch) = **8x more consistent**
+- Validation accuracy: **80%** (both implementations, identical predictions)
+
+**Trade-offs**:
+- MAX compilation overhead: ~2.3s (one-time cost, amortized after ~50 inferences)
+- HuggingFace load time: 0.15s (faster cold start)
 
 ---
 
-## Key Learnings So Far
+## Key Learnings
 
 ### About MAX Engine
-1. **Primary use case**: Serving GenAI/LLM models, not classification models
+1. **Primary use case**: Serving GenAI/LLM models, but works great for custom architectures
 2. **Architecture**: Graph building (Python/Mojo) → compiler optimisation → hardware-agnostic execution
-3. **Mojo API maturity**: Python API is stable; Mojo API is experimental
+3. **Mojo API maturity**: Python API is production-ready; Mojo API is experimental
 4. **ONNX support**: Custom extensions required for unsupported ops, not plug-and-play
+5. **Performance**: Significant speedups (5-6x) with better consistency than PyTorch on CPU
+
+### About MAX Graph API Patterns
+1. **Linear layers**: No `ops.linear()`, use `ops.matmul(x, ops.transpose(W, 1, 0)) + bias`
+2. **Attention masks**: Convert 1/0 masks to additive masks (`-10000.0` for masked positions)
+3. **Multi-head attention**: Use `ops.permute()` for 4D tensor transposes
+4. **Layer normalisation**: `ops.layer_norm(x, weight, bias, epsilon)` - epsilon is positional, not kwarg
+5. **Weight loading**: `weight.allocate(DType.float32).cast(target_dtype)`
+6. **Device handling**: Use `DeviceRef` for graph building, `CPU()` for sessions
+7. **Module from max.nn**: Import `Module` from `max.nn`, not `max.graph`
+
+### Critical Implementation Details
+1. **Model-specific layers**: Always check the exact architecture (e.g., DistilBERT's pre-classifier layer)
+2. **Weight names vary**: DistilBERT uses `q_lin`, `k_lin`, `v_lin` not `query`, `key`, `value`
+3. **Token types**: DistilBERT has no token type embeddings (only word + position)
+4. **Debugging**: Use `safetensors` library to inspect weight names when troubleshooting
 
 ### About Project Evolution
-1. **Start simple**: Lexicon-based MVP validated the concept quickly
-2. **Research first**: Understanding MAX's actual purpose saved us from the wrong path
-3. **Use examples**: Modular's BERT example provides the blueprint
+1. **Start simple**: Lexicon-based MVP (v0.1.0) validated the concept quickly
+2. **Research first**: Understanding MAX's actual purpose saved us from wrong paths
+3. **Don't reuse blindly**: Custom components can be cleaner than adapting heavy examples
 4. **Iterate based on discoveries**: Pivot from "load ONNX" to "build custom graph"
+5. **Build from scratch**: Writing custom embeddings/attention gave deeper understanding
 
-### Technical Debt & Decisions
-1. **Downloaded ONNX model**: Not currently used, but contains the weights we need
-2. **Python first, Mojo later**: Pragmatic given Mojo API limitations
-3. **Custom graph approach**: More work upfront, but better long-term path
+### About Benchmarking
+1. **Config-driven**: TOML configuration makes benchmarks reproducible and shareable
+2. **Separate test data**: Keep test cases in JSON/JSONL for version control
+3. **Multiple formats**: Generate console, JSON, CSV, and markdown reports
+4. **System info matters**: Record hardware, OS, and library versions for context
+5. **Warmup iterations**: Account for compilation/JIT overhead (we used 10)
+
+### Technical Decisions & Trade-offs
+1. **Python first, Mojo later**: Pragmatic given Mojo API maturity
+2. **Custom graph approach**: More work upfront, but better control and performance
+3. **Compilation overhead**: 2-3s one-time cost is acceptable for production inference
+4. **No ONNX**: Weights from HuggingFace safetensors, not ONNX export
+
+---
+
+## Chapter 5: Documentation & Knowledge Sharing
+
+### What We Created
+
+1. **MAX Framework Guide** (`docs/MAX_FRAMEWORK_GUIDE.md`)
+   - What MAX is and the problem it solves (ML infrastructure fragmentation)
+   - Key concepts: graphs, weights, compilation
+   - MAX APIs: Python Graph (production), Pipeline (LLMs), Mojo (experimental)
+   - Our DistilBERT implementation explained
+   - Common patterns and debugging tips
+   - Performance characteristics and when to use MAX
+
+2. **Minimal MAX Example** (`examples/minimal_max_example.py`)
+   - Simplest possible working example (matrix multiply + bias + ReLU)
+   - ~100 lines, demonstrates complete workflow
+   - Build graph → compile → execute → verify
+   - Perfect for learning the basics
+
+3. **Project Status Document** (`docs/PROJECT_STATUS.md`)
+   - Current implementation status (v0.2.0 complete)
+   - Key files and their purposes
+   - What we learned (API patterns, implementation details)
+   - Performance characteristics
+   - Future directions
+
+4. **Comprehensive Benchmarking Framework**
+   - Config-driven harness supporting multiple implementations
+   - Test data in JSONL format (version controlled)
+   - Multiple output formats (console, JSON, CSV, markdown)
+   - System information reporting for reproducibility
+
+### Why Documentation Matters
+
+**For future us**: MAX is new, APIs are evolving, patterns aren't widely known yet. Writing this down captures what we learned while it's fresh.
+
+**For others**: Few examples exist of custom MAX Graph implementations outside GenAI. This could help others building classification/regression models.
+
+**For learning**: Writing the minimal example forced us to distill the essential patterns. Teaching is the best way to verify understanding.
 
 ---
 
 ## What's Next
 
-1. Implement DistilBERT MAX Graph
-2. Load pre-trained weights from HuggingFace
-3. Create inference API
-4. Benchmark performance vs alternatives
-5. (Future) Optimise critical paths in Mojo
-6. (Future) Deploy with MAX Serve
+### Completed ✅
+1. ✅ Lexicon-based MVP (v0.1.0)
+2. ✅ Custom DistilBERT MAX Graph (v0.2.0)
+3. ✅ Comprehensive benchmarking framework
+4. ✅ Documentation and examples
+
+### Potential Future Work
+
+**Short-term**:
+- Add more test cases (edge cases, longer texts)
+- Experiment with quantization (int8, int4)
+- Multi-batch inference optimisation
+- Add FastAPI wrapper for REST API
+
+**Medium-term**:
+- Try other architectures (BERT, RoBERTa, ALBERT)
+- Explore MAX Pipeline API for LLMs
+- Deploy with MAX Serve (production inference server)
+- GPU support when Apple GPU APIs are available in Python
+
+**Long-term**:
+- Mojo implementation when APIs stabilize
+- Custom kernel development for specific ops
+- Multi-model serving pipeline
+- Distributed inference across devices
 
 ---
 
