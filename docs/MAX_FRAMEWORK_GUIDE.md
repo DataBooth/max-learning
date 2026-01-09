@@ -201,7 +201,7 @@ logits = ops.matmul(pooled_output, ops.transpose(self.classifier_weight, 1, 0))
 - **Worth it for**: Production services, batch processing
 
 ### Runtime Performance
-On Apple M3 CPU (100 iterations):
+On Apple M1 CPU (100 iterations):
 - **MAX**: 45.88ms mean latency (21.80 req/sec)
 - **PyTorch**: 255.85ms mean latency (3.91 req/sec)
 - **Speedup**: 5.58x faster!

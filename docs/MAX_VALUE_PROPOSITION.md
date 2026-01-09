@@ -82,7 +82,7 @@ enabled in MAX and Python APIs yet
 device = CPU()
 
 # Future (no other changes needed!)
-device = Accelerator()  # Automatically uses M3 GPU
+device = Accelerator()  # Automatically uses M1 GPU
 ```
 
 No Metal code, no platform-specific logic. Pure hardware abstraction.

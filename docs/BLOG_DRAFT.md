@@ -447,7 +447,7 @@ Error: Current compilation target does not support operation: mma
 ### Documentation Created
 
 - `examples/python/elementwise_gpu.py` - Working GPU example
-- `examples/python/minimal_max_graph_gpu.py` - matmul test (fails)
+- `examples/python/linear_layer.py` - matmul test (fails)
 - `examples/python/README_gpu_experiments.md` - Complete findings
 - `docs/XCODE_COMPATIBILITY.md` - Xcode 26 toolchain issue details
 
@@ -570,7 +570,7 @@ Why MAX fits our DistilBERT sentiment classifier:
 
 **Alternative approaches**:
 - ONNX Runtime: Export to ONNX, run, but limited Apple GPU support
-- TensorRT: NVIDIA only, can't use on M3 MacBook
+- TensorRT: NVIDIA only, can't use on M1 MacBook
 - PyTorch: Keep full framework overhead for inference
 - CoreML: Lock into Apple ecosystem
 

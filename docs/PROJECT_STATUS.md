@@ -26,7 +26,7 @@ This project implements a high-performance sentiment analysis service using **Mo
    - System information reporting (hardware, software versions)
 
 3. **Performance Results**
-   - **5.58x faster** than HuggingFace PyTorch on Apple M3 CPU
+   - **5.58x faster** than HuggingFace PyTorch on Apple M1 CPU
    - **85% better P95 latency**
    - **8x more consistent** performance (lower variance)
    - Identical prediction accuracy (80% on validation set)
@@ -98,7 +98,7 @@ These were from the **original Mojo implementation plan** which has been superse
 - **Amortized**: After ~50 inferences
 - **Worth it for**: Production services, batch processing
 
-### Runtime (Apple M3 CPU, 100 iterations)
+### Runtime (Apple M1 CPU, 100 iterations)
 - **MAX**: 45.88ms mean, 21.80 req/sec
 - **PyTorch**: 255.85ms mean, 3.91 req/sec
 - **Speedup**: 5.58x

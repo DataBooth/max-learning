@@ -53,7 +53,7 @@ example-distilbert = "python examples/python/03_distilbert_sentiment/distilbert_
 
 ### 6. Clean up old files
 - [ ] Remove `examples/python/minimal_max_graph.py`
-- [ ] Remove `examples/python/minimal_max_graph_gpu.py`
+- [ ] Remove `examples/python/linear_layer.py`
 - [ ] Remove `examples/python/elementwise_gpu.py`
 - [ ] Remove or consolidate READMEs in root
 

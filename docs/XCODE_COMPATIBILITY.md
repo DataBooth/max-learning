@@ -8,7 +8,7 @@ MAX GPU compilation fails on macOS with Xcode 26.2 due to missing `metallib` too
 
 - **macOS**: Sonoma 14.6 (or later)
 - **Xcode**: 26.2 (Build 17C52)
-- **Hardware**: Apple Silicon M3
+- **Hardware**: Apple Silicon M1
 - **MAX**: Via pixi/modular package (January 2026)
 
 ## Error
@@ -78,7 +78,7 @@ Title: MAX GPU compilation fails with Xcode 26.2 - metallib tool not found
 Environment:
 - Xcode 26.2 (Build 17C52)
 - macOS Sonoma 14.6
-- Apple Silicon M3
+- Apple Silicon M1
 - MAX version: [check with `mojo --version`]
 
 Error:

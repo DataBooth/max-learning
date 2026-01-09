@@ -22,7 +22,7 @@ pixi run example-elementwise-gpu    # Run on Apple Silicon GPU
 - Data transfer between devices
 - Verifying results
 
-**GPU Support**: ✅ Works on Apple Silicon (M1/M2/M3)
+**GPU Support**: ✅ Works on Apple Silicon (M1/M2/M1)
 
 ---
 

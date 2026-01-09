@@ -2,12 +2,12 @@
 
 ## Overview
 
-This directory contains experiments testing MAX Graph operations on Apple Silicon GPU (M3).
+This directory contains experiments testing MAX Graph operations on Apple Silicon GPU (M1).
 
 ## Files
 
 - **`elementwise_gpu.py`** - Element-wise operations (add, multiply, relu)
-- **`minimal_max_graph_gpu.py`** - Linear layer with matmul
+- **`linear_layer.py`** - Linear layer with matmul
 
 ## Findings
 
@@ -50,7 +50,7 @@ xcodebuild -downloadComponent MetalToolchain
 - Metal tools are ~750MB and must be explicitly downloaded
 - Once installed, GPU compilation works perfectly for supported operations
 
-#### Matrix Operations (`minimal_max_graph_gpu.py`)
+#### Matrix Operations (`linear_layer.py`)
 
 **Operations tested**:
 - `ops.matmul` - Matrix multiplication
@@ -120,7 +120,7 @@ Our DistilBERT implementation uses:
 ## Running the Examples
 
 ### Prerequisites
-1. Apple Silicon Mac (M1/M2/M3)
+1. Apple Silicon Mac (M1 - M5)
 2. Xcode command-line tools installed
 3. MAX installed via pixi
 
@@ -131,7 +131,7 @@ Our DistilBERT implementation uses:
 pixi run python examples/python/elementwise_gpu.py
 
 # Matrix operations (will fail on missing kernel)
-pixi run python examples/python/minimal_max_graph_gpu.py
+pixi run python examples/python/linear_layer.py
 ```
 
 ## Future Work
