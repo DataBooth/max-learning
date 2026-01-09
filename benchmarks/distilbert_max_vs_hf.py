@@ -341,9 +341,48 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
     md.append("## System Information")
     md.append("")
     import platform
-    md.append(f"- **OS**: {platform.system()} {platform.release()}")
+    import psutil
+    
+    # Hardware
+    md.append("### Hardware")
+    md.append("")
+    md.append(f"- **OS**: {platform.system()} {platform.release()} ({platform.version()})")
     md.append(f"- **Machine**: {platform.machine()}")
+    md.append(f"- **Processor**: {platform.processor()}")
+    md.append(f"- **CPU Cores**: {psutil.cpu_count(logical=False)} physical, {psutil.cpu_count(logical=True)} logical")
+    
+    # Memory
+    mem = psutil.virtual_memory()
+    md.append(f"- **RAM**: {mem.total / (1024**3):.1f} GB total, {mem.available / (1024**3):.1f} GB available")
+    md.append("")
+    
+    # Software
+    md.append("### Software")
+    md.append("")
     md.append(f"- **Python**: {platform.python_version()}")
+    
+    # Key library versions
+    try:
+        import transformers
+        md.append(f"- **transformers**: {transformers.__version__}")
+    except: pass
+    
+    try:
+        import torch
+        md.append(f"- **torch**: {torch.__version__}")
+    except: pass
+    
+    try:
+        import max
+        # MAX doesn't have __version__, check for version info
+        md.append(f"- **max**: (Modular MAX Engine)")
+    except: pass
+    
+    try:
+        import numpy
+        md.append(f"- **numpy**: {numpy.__version__}")
+    except: pass
+    
     md.append("")
     
     return "\n".join(md)

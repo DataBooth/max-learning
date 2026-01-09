@@ -54,5 +54,4 @@ logs/
 .coverage
 htmlcov/
 
-# Benchmarks output
-benchmarks/results/
+# Benchmarks output - track all results with datetime stamps
