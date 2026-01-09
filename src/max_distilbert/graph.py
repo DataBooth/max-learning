@@ -58,7 +58,10 @@ class DistilBertClassifier(Module):
         )
         
         # Classification head (sentiment: 2 classes)
-        # These weights come from the pre-trained model's classifier
+        # DistilBERT sequence classification uses: pre_classifier → ReLU → dropout → classifier
+        # We skip dropout in inference mode
+        self.pre_classifier_weight = weights.pre_classifier.weight.allocate(DType.float32).cast(dtype)
+        self.pre_classifier_bias = weights.pre_classifier.bias.allocate(DType.float32).cast(dtype)
         self.classifier_weight = weights.classifier.weight.allocate(DType.float32).cast(dtype)
         self.classifier_bias = weights.classifier.bias.allocate(DType.float32).cast(dtype)
         self.hidden_size = huggingface_config.hidden_size
@@ -88,9 +91,13 @@ class DistilBertClassifier(Module):
         # Shape: [batch_size, hidden_size]
         cls_output = encoder_outputs[:, 0, :]
         
-        # Classification head: linear projection to num_labels
-        # logits = cls_output @ W^T + b
-        logits = ops.matmul(cls_output, ops.transpose(self.classifier_weight, 1, 0)) + self.classifier_bias
+        # Classification head: pre_classifier → ReLU → classifier
+        # (dropout is skipped in inference mode)
+        pooled_output = ops.matmul(cls_output, ops.transpose(self.pre_classifier_weight, 1, 0)) + self.pre_classifier_bias
+        pooled_output = ops.relu(pooled_output)
+        
+        # Final classification layer
+        logits = ops.matmul(pooled_output, ops.transpose(self.classifier_weight, 1, 0)) + self.classifier_bias
         
         return logits
 
