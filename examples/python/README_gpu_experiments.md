@@ -27,36 +27,28 @@ Apple Silicon GPU support in MAX is **partial** - depends on kernel availability
 - `ops.add` - Element-wise addition  
 - `ops.relu` - Element-wise ReLU
 
-**Result**: ✅ GPU kernels exist, ❌ Metal toolchain issue
+**Result**: ✅ **WORKING!** Element-wise operations run successfully on GPU
 
 ```
 ✓ Accelerator device found: Device(type=gpu,id=0)
 ✓ Graph 'elementwise_gpu' created
-✗ Compilation failed: Xcode/Metal toolchain not properly configured
+✓ Graph compiled and loaded on GPU
+✓ Inference executed on GPU
+✓ Results match NumPy validation
 ```
 
-**Error**:
-```
-max/kernels/src/Mogg/MOGGKernelAPI:1:1: error: Please make sure Xcode is installed and setup correctly
-xcrun: error: unable to find utility "metallib", not a developer tool or in PATH
-```
+**Initial Issue**: Xcode 26 doesn't include Metal Toolchain by default
 
-**What this means**:
-- GPU kernels ARE available for these operations
-- Compilation attempts to generate Metal shaders
-- Xcode command-line tools need proper setup
-
-**Potential fix**:
+**Fix**:
 ```bash
-# Install Xcode command-line tools
-xcode-select --install
-
-# Accept Xcode license
-sudo xcodebuild -license accept
-
-# Set Xcode path
-sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+# Download Metal Toolchain for Xcode 26
+xcodebuild -downloadComponent MetalToolchain
 ```
+
+**What this revealed**:
+- Xcode 26 changed to on-demand component downloads (like iOS SDKs)
+- Metal tools are ~750MB and must be explicitly downloaded
+- Once installed, GPU compilation works perfectly for supported operations
 
 #### Matrix Operations (`minimal_max_graph_gpu.py`)
 
@@ -88,14 +80,17 @@ note: constraint failed: Current compilation target does not support operation: 
 
 ## Key Takeaways
 
-### What Works (with proper setup)
-✅ Element-wise operations (add, mul, relu)  
+### What Works ✅
+✅ **Element-wise operations on Apple Silicon GPU** (add, mul, relu)  
 ✅ GPU device detection
 ✅ Graph building for GPU
+✅ Graph compilation for GPU (after Metal Toolchain install)
+✅ GPU inference execution
+✅ Correct results (validated against NumPy)
 
 ### What Doesn't Work Yet
-❌ Matrix multiplication (`matmul`) on GPU  
-❌ Metal toolchain auto-configuration
+❌ Matrix multiplication (`matmul`) on GPU - missing kernel
+❌ Metal toolchain auto-configuration (manual download required)
 
 ### Implications for Our DistilBERT Model
 

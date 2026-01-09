@@ -13,7 +13,7 @@ Run: pixi run python examples/python/elementwise_gpu.py
 """
 
 import numpy as np
-from max.driver import Accelerator, CPU
+from max.driver import Accelerator, CPU, Tensor
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -91,8 +91,11 @@ def main():
     
     # 3. Prepare input
     print("3. Preparing input...")
-    input_data = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
-    print(f"   Input: {input_data}\n")
+    input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
+    print(f"   Input: {input_data_np}\n")
+    
+    # Transfer input to device (GPU or CPU)
+    input_data = Tensor.from_numpy(input_data_np).to(gpu_device)
     
     # 4. Execute
     print(f"4. Executing inference on {device_name}...")
@@ -106,7 +109,7 @@ def main():
     
     # 5. Verify with NumPy
     print("5. Verifying with NumPy...")
-    expected = np.maximum(0, input_data * 2.0 + 1.0)  # relu(x * 2 + 1)
+    expected = np.maximum(0, input_data_np * 2.0 + 1.0)  # relu(x * 2 + 1)
     print(f"   Expected: {expected}")
     match = np.allclose(output_np, expected)
     print(f"   Match: {match}\n")

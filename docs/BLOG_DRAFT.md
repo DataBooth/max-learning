@@ -244,7 +244,7 @@ from max_distilbert import DistilBertSentimentClassifier
 
 Built comprehensive benchmarking framework with 100 iterations:
 
-**Benchmark Results (Apple M3 CPU)**:
+**Benchmark Results (Apple M1 CPU)**:
 - **MAX Engine**: 45.88ms mean latency (21.80 req/sec)
 - **HuggingFace PyTorch**: 255.85ms mean latency (3.91 req/sec)
 - **Speedup**: **5.58x faster** 🚀
@@ -344,6 +344,112 @@ Built comprehensive benchmarking framework with 100 iterations:
 **For others**: Few examples exist of custom MAX Graph implementations outside GenAI. This could help others building classification/regression models.
 
 **For learning**: Writing the minimal example forced us to distill the essential patterns. Teaching is the best way to verify understanding.
+
+---
+
+## Chapter 6: Apple Silicon GPU Experiments
+
+### The Question
+
+After achieving 5.58x CPU speedup, we wondered: **Can we run MAX on Apple Silicon GPU?**
+
+From Modular Discord feedback:
+> "That's mostly a matter of adding kernels for it. There are still a few kernels without generic fallbacks, but some models in MAX might work."
+
+### The Experiments
+
+We created two test cases:
+
+#### Experiment 1: Element-wise Operations
+**Operations**: `ops.mul`, `ops.add`, `ops.relu`  
+**Expected**: Should have GPU kernels (simple operations)
+
+#### Experiment 2: Matrix Multiplication  
+**Operations**: `ops.matmul`, `ops.transpose`  
+**Expected**: Might not have GPU kernels yet
+
+### Initial Roadblock: Xcode 26 Toolchain Issue
+
+**Problem**: GPU compilation failed with cryptic error
+```
+xcrun: error: unable to find utility "metallib", not a developer tool or in PATH
+```
+
+**Investigation**:
+- Xcode 26.2 is installed and configured
+- `metal` compiler exists
+- But `metallib` tool is missing
+
+**Discovery**: Xcode 26 changed to on-demand component downloads (like iOS SDKs). The Metal Toolchain (~750MB) must be explicitly downloaded.
+
+**Solution**:
+```bash
+xcodebuild -downloadComponent MetalToolchain
+```
+
+### Results
+
+#### Element-wise Operations: ✅ **SUCCESS!**
+
+```
+✓ Accelerator device found: Device(type=gpu,id=0)
+✓ Graph compiled and loaded on GPU  
+✓ Inference executed on GPU
+✓ Results match NumPy validation
+
+Operations tested:
+  - Element-wise multiplication (ops.mul)
+  - Element-wise addition (ops.add)
+  - Element-wise ReLU (ops.relu)
+```
+
+**First successful GPU inference on Apple Silicon with MAX!** 🎉
+
+#### Matrix Multiplication: ❌ **Missing Kernel**
+
+```
+✓ Accelerator device found
+✓ Graph built
+✗ Compilation failed: matmul kernel not available
+
+Error: Current compilation target does not support operation: mma
+(mma = matrix multiply-accumulate)
+```
+
+**Conclusion**: `matmul` doesn't have Apple Silicon GPU kernel yet.
+
+### Implications
+
+**What works on GPU**:
+- ✅ Element-wise operations  
+- ✅ Graph compilation
+- ✅ Data transfer (CPU ↔ GPU)
+- ✅ Correct results
+
+**What doesn't work yet**:
+- ❌ Matrix multiplication
+- ❌ Therefore: No transformer models (heavy matmul usage)
+- ❌ Therefore: DistilBERT stays on CPU for now
+
+**Hardware portability status**:
+- CPU: ✅ Excellent performance (5.58x speedup)
+- Apple GPU: ⏳ Partial support (element-wise ops work, matmul coming)
+- NVIDIA/AMD GPU: ✅ Should work (MAX primary GPU target)
+
+### Key Learnings from GPU Work
+
+1. **Xcode 26 requires manual Metal Toolchain download** - new behaviour from Apple
+2. **MAX GPU kernel availability varies by operation** - exactly as Modular team said
+3. **Element-wise ops work great on Apple GPU** - promising foundation
+4. **Matmul is the blocker for transformers** - most important operation for neural networks
+5. **CPU performance is already excellent** - 5.58x speedup means GPU is "nice to have" not "must have"
+
+### Documentation Created
+
+- `examples/python/elementwise_gpu.py` - Working GPU example
+- `examples/python/minimal_max_graph_gpu.py` - matmul test (fails)
+- `examples/python/README_gpu_experiments.md` - Complete findings
+- `docs/XCODE_COMPATIBILITY.md` - Xcode 26 toolchain issue details
 
 ---
 
