@@ -1,0 +1,5 @@
+{"text": "This movie was fantastic!", "expected_label": "POSITIVE"}
+{"text": "Terrible product, waste of money.", "expected_label": "NEGATIVE"}
+{"text": "It was okay.", "expected_label": "NEGATIVE"}
+{"text": "Best thing I've ever bought!", "expected_label": "POSITIVE"}
+{"text": "Complete disaster.", "expected_label": "NEGATIVE"}

@@ -1,0 +1,100 @@
+# Benchmark Configuration
+# Config-driven benchmarking framework for ML inference implementations
+
+[benchmark]
+name = "DistilBERT Sentiment Analysis Benchmark"
+description = "Performance comparison: MAX Engine vs HuggingFace PyTorch"
+warmup_iterations = 10
+test_iterations = 100
+save_results = true
+results_dir = "benchmark_results"
+timestamp_results = true  # Add timestamp to result filenames
+
+[model]
+path = "models/distilbert-sentiment"
+task = "sentiment-analysis"
+
+[test_data]
+# Path to benchmark test data (JSONL format)
+benchmark_file = "test_data/sentiment_benchmark.jsonl"
+
+# Path to validation test data for correctness checking
+validation_file = "test_data/sentiment_validation.jsonl"
+
+# Number of times to repeat the benchmark dataset
+repeat = 10
+
+# Optional: filter by category (empty = use all)
+# categories = ["short", "medium"]  # Uncomment to filter
+
+[implementations.max]
+enabled = true
+name = "MAX Engine"
+description = "Custom MAX Graph implementation with DistilBERT"
+type = "custom"
+module = "src.max_distilbert.inference"
+class_name = "DistilBertSentimentClassifier"
+# Custom initialization args (passed to __init__)
+init_args = { model_path = "{{model.path}}" }
+
+[implementations.huggingface_cpu]
+enabled = true
+name = "HuggingFace (PyTorch CPU)"
+description = "Transformers pipeline on CPU"
+type = "huggingface_pipeline"
+device = "cpu"
+
+[implementations.huggingface_mps]
+enabled = false  # Enable for Apple Silicon GPU testing
+name = "HuggingFace (PyTorch MPS)"
+description = "Transformers pipeline on Apple Silicon GPU"
+type = "huggingface_pipeline"
+device = "mps"
+
+[implementations.onnx]
+enabled = false  # Enable for ONNX Runtime comparison
+name = "ONNX Runtime"
+description = "ONNX optimized inference"
+type = "onnx"
+model_path = "models/distilbert-sentiment/model.onnx"
+
+[output]
+# Metrics to calculate and report
+metrics = [
+    "mean",
+    "median",
+    "p50",
+    "p95",
+    "p99",
+    "min",
+    "max",
+    "std",
+    "throughput"
+]
+
+# Output formats (multiple allowed)
+formats = ["console", "json", "csv", "markdown"]
+
+# Include per-iteration raw data in output
+include_raw_data = false
+
+# Generate visualization plots (requires matplotlib)
+generate_plots = false
+
+# Comparison baseline (name of implementation to compare against)
+baseline = "huggingface_cpu"
+
+[output.console]
+# Console output styling
+style = "table"  # Options: table, simple, detailed
+show_comparison = true
+show_speedup = true
+highlight_best = true
+
+[output.json]
+pretty_print = true
+indent = 2
+
+[output.csv]
+delimiter = ","
+include_header = true

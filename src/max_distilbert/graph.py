@@ -21,8 +21,8 @@ from max.pipelines.lib import PipelineConfig
 from transformers import AutoConfig
 
 # Import our custom DistilBERT components
-from embeddings import DistilBertEmbeddings
-from transformer import DistilBertTransformerEncoder
+from .embeddings import DistilBertEmbeddings
+from .transformer import DistilBertTransformerEncoder
 
 
 class DistilBertClassifier(Module):

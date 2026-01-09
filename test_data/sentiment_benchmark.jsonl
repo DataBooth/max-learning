@@ -1,0 +1,15 @@
+{"text": "good", "expected_label": "POSITIVE", "category": "very_short"}
+{"text": "bad", "expected_label": "NEGATIVE", "category": "very_short"}
+{"text": "bad movie", "expected_label": "NEGATIVE", "category": "short"}
+{"text": "great film", "expected_label": "POSITIVE", "category": "short"}
+{"text": "This is a great product!", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "Not worth the money at all.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Best purchase ever!", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "Highly recommend to everyone.", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "Would not buy this again.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "I absolutely loved this movie. It was fantastic!", "expected_label": "POSITIVE", "category": "long"}
+{"text": "This movie was absolutely fantastic! I loved every minute of it.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "The product quality is terrible and customer service was even worse.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Complete waste of money and time.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Terrible experience. Would not recommend.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "It was okay, nothing special.", "expected_label": "NEGATIVE", "category": "medium"}

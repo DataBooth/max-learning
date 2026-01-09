@@ -1,0 +1,46 @@
+{
+  "benchmark": {
+    "name": "DistilBERT Sentiment Analysis Benchmark",
+    "description": "Performance comparison: MAX Engine vs HuggingFace PyTorch",
+    "warmup_iterations": 10,
+    "test_iterations": 100,
+    "save_results": true,
+    "results_dir": "benchmark_results",
+    "timestamp_results": true
+  },
+  "results": [
+    {
+      "name": "MAX Engine",
+      "description": "Custom MAX Graph implementation with DistilBERT",
+      "load_time_s": 3.0159338330850005,
+      "mean_ms": 42.916072921361774,
+      "median_ms": 42.31972899287939,
+      "p50_ms": 42.31972899287939,
+      "p95_ms": 60.19079760299063,
+      "p99_ms": 69.55331133794972,
+      "min_ms": 25.55583301000297,
+      "max_ms": 71.27129193395376,
+      "std_ms": 10.232537915243258,
+      "throughput_rps": 23.301293243498126,
+      "iterations": 100,
+      "raw_latencies_ms": null
+    },
+    {
+      "name": "HuggingFace (PyTorch CPU)",
+      "description": "Transformers pipeline on CPU",
+      "load_time_s": 0.12867412494961172,
+      "mean_ms": 235.13741167960688,
+      "median_ms": 232.28572856169194,
+      "p50_ms": 232.28572856169194,
+      "p95_ms": 390.8708465169184,
+      "p99_ms": 416.6876784258059,
+      "min_ms": 32.28416608180851,
+      "max_ms": 471.46887506823987,
+      "std_ms": 101.25594757761296,
+      "throughput_rps": 4.252832387908472,
+      "iterations": 100,
+      "raw_latencies_ms": null
+    }
+  ],
+  "timestamp": "20260109_112920"
+}
