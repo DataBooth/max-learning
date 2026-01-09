@@ -1,6 +1,6 @@
-# Contributing to mojo-inference-service
+# Contributing to max-learning
 
-Thank you for your interest in contributing! This project is part of DataBooth's exploration of high-performance AI infrastructure with Mojo.
+Thank you for your interest in contributing! This project is part of DataBooth's exploration of high-performance AI infrastructure with Modular's MAX framework.
 
 ## Development Setup
 
@@ -11,8 +11,8 @@ Thank you for your interest in contributing! This project is part of DataBooth's
 
 2. **Clone the repository**:
    ```bash
-   git clone https://github.com/databooth/mojo-inference-service.git
-   cd mojo-inference-service
+   git clone https://github.com/DataBooth/max-learning.git
+   cd max-learning
    ```
 
 3. **Install dependencies**:

@@ -74,7 +74,7 @@ fn parse_args() raises -> CliArgs:
 
 fn print_help():
     """Print usage information."""
-    print("mojo-inference-service v0.1.0-dev")
+    print("max-learning v0.2.0")
     print("")
     print("USAGE:")
     print("    pixi run inference --text <TEXT> [OPTIONS]")

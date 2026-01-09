@@ -6,7 +6,7 @@
 
 set -e  # Exit on error
 
-echo "🔥 mojo-inference-service Model Download"
+echo "🔥 max-learning Model Download"
 echo "=========================================="
 echo ""
 

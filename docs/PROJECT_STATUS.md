@@ -39,8 +39,8 @@ This project implements a high-performance sentiment analysis service using **Mo
 ### Key Files
 
 ```
-mojo-inference-service/
-├── src/max_distilbert/         # Custom MAX Graph implementation
+max-learning/
+├── src/python/max_distilbert/  # Custom MAX Graph implementation
 │   ├── __init__.py
 │   ├── embeddings.py           # Custom embeddings (no token types)
 │   ├── transformer.py          # DistilBERT-specific attention & FFN

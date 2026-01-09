@@ -1,7 +1,7 @@
 """
-mojo-inference-service - High-performance AI model inference service
+max-learning - Learning and experimenting with MAX framework
 
-Entry point for the inference service application.
+Entry point for the lexicon-based sentiment classifier (v0.1.0 baseline).
 """
 
 from logger import Logger, Level
@@ -23,7 +23,7 @@ fn main() raises:
     # Initial logger for startup
     var startup_log = Logger[Level.INFO]()
     
-    startup_log.info("🔥 mojo-inference-service v0.1.0-dev")
+    startup_log.info("🔥 max-learning v0.2.0 (Mojo lexicon classifier)")
     startup_log.info("Starting up...")
     
     # Parse command-line arguments

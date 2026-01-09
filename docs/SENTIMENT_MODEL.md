@@ -359,4 +359,4 @@ Confidence: 0.504
 
 ## Sponsorship
 
-This model and documentation are part of the mojo-inference-service project, sponsored by [DataBooth](https://www.databooth.com.au/posts/mojo).
+This model and documentation are part of the max-learning project, sponsored by [DataBooth](https://www.databooth.com.au/posts/mojo).

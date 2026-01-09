@@ -25,7 +25,7 @@ I managed to get element-wise operations running successfully on GPU via MAX Gra
 
 CPU dominates across all sizes tested. This likely reflects GPU dispatch overhead and how well small tensors fit in CPU cache. Not sure if there are better workloads or patterns to test where GPU would shine.
 
-**Benchmark code:** https://github.com/databooth/mojo-inference-service/blob/main/examples/python/01_elementwise/benchmark_sizes.py
+**Benchmark code:** https://github.com/DataBooth/max-learning/blob/main/examples/python/01_elementwise/benchmark_sizes.py
 
 Feedback on benchmarking methodology welcome!
 
@@ -52,7 +52,7 @@ This is because Xcode 26 switched to on-demand component downloads.
 ## Code Example
 
 Simple element-wise example (works on both CPU and GPU):
-https://github.com/databooth/mojo-inference-service/blob/main/examples/python/01_elementwise/elementwise.py
+https://github.com/DataBooth/max-learning/blob/main/examples/python/01_elementwise/elementwise.py
 
 ## Environment
 
