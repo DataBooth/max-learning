@@ -17,9 +17,9 @@ Traditional ML deployment requires:
 **Hardware-Portable Graph Compiler**:
 1. You define **WHAT** to compute (computation graph in Python/Mojo)
 2. MAX compiler optimizes **HOW** to compute (fuses ops, selects kernels)
-3. Runs optimized on **WHERE** (CPU, NVIDIA GPU, AMD GPU, Apple GPU†)
+3. Runs optimized on **WHERE** (CPU, NVIDIA GPU, AMD GPU, Apple GPU*)
 
-† Apple GPU support coming to Python/Graph APIs
+*Apple GPU support is partial - depends on kernel availability for specific operations. Some models work, others require CPU fallback for missing kernels.
 
 Think of MAX as **LLVM for ML workloads**.
 

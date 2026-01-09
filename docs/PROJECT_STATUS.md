@@ -129,7 +129,7 @@ These were from the **original Mojo implementation plan** which has been superse
 1. Add other model architectures (BERT, RoBERTa)
 2. Explore MAX Pipeline API for LLMs
 3. Deploy with MAX Serve (production serving)
-4. GPU support when Apple GPU APIs are available
+4. Experiment with Apple GPU (partial support - kernel availability dependent)
 5. Add FastAPI wrapper for REST API
 
 ### Long-term
