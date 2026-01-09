@@ -1,20 +1,24 @@
-# mojo-inference-service 🔥
+# MAX Inference Experiments 🔥
 
-A high-performance AI model inference service built in Mojo, demonstrating real-world usage of configuration management with [mojo-toml](https://github.com/databooth/mojo-toml) and [mojo-dotenv](https://github.com/databooth/mojo-dotenv).
+Learning and experimenting with Modular's MAX framework for high-performance ML inference. Starting from simple examples through to production transformer models.
 
 ## Status
 
-**Version**: 0.1.0-dev  
-**Stage**: Early Development
+**Version**: 0.2.0  
+**Stage**: Active Experimentation
 
-## Features
+## What's Here
 
-- **Pure Mojo inference**: Simple text classification built from scratch in Mojo
-- **Configuration management**: Using TOML for application settings via [mojo-toml](https://github.com/databooth/mojo-toml)
-- **Secrets management**: Using .env for API keys via [mojo-dotenv](https://github.com/databooth/mojo-dotenv)
-- **Structured logging**: Built on Mojo's standard library Logger
-- **Benchmarking**: Compare performance against Python equivalents
-- **Future-ready**: Architecture designed for Modular MAX integration (v0.2.0)
+### Implementations
+- **MAX Graph DistilBERT**: Full transformer sentiment classifier achieving **5.58x speedup** over PyTorch on M1
+- **Mojo Lexicon Classifier**: Simple sentiment classifier built in pure Mojo (v0.1.0 baseline)
+- **Apple Silicon GPU**: First reported successful MAX Graph inference on Apple GPU
+
+### Learning Resources
+- **Numbered Examples**: Progressive learning path from element-wise ops → linear layers → full transformers
+- **Comprehensive Docs**: MAX Framework Guide, implementation details, GPU experiments
+- **Benchmarking**: CPU vs PyTorch, CPU vs GPU comparisons
+- **Testing**: Full pytest suite validating implementations
 
 ## Quick Start
 
@@ -22,124 +26,93 @@ A high-performance AI model inference service built in Mojo, demonstrating real-
 # Install dependencies
 pixi install
 
-# Run inference
-pixi run inference --text "This product is amazing!"
-# Output: POSITIVE (confidence: 0.87)
-
-# Run with configuration
-pixi run inference --text "Terrible experience" --config config.toml
+# Run examples (progressive learning)
+pixi run example-elementwise-cpu   # Simple ops: mul, add, relu
+pixi run example-elementwise-gpu   # Same ops on Apple Silicon GPU
+pixi run example-linear            # Linear layer (matmul + bias + relu)
+pixi run example-distilbert        # Full transformer sentiment analysis
 
 # Run tests
-pixi run test
+pixi run test                      # Full pytest suite (21 tests)
+
+# Run benchmarks
+pixi run benchmark-distilbert      # MAX vs PyTorch comparison
 ```
 
-## Configuration
+## Performance Results
 
-### config.toml
+### DistilBERT Sentiment (M1 CPU)
+- **MAX**: 45.88ms mean, 21.80 req/sec
+- **PyTorch**: 255.85ms mean, 3.91 req/sec
+- **Speedup**: **5.58x faster**, 85% better P95 latency
 
-```toml
-[model]
-type = "sentiment-analysis"
-algorithm = "logistic-regression"  # Simple classifier for MVP
-vocab_size = 10000
-embedding_dim = 100
+### Apple Silicon GPU (Element-wise)
+- ✅ First reported MAX Graph inference on Apple GPU
+- 🚧 `matmul` kernel not yet available (blocks transformers)
+- See [Apple Silicon GPU Findings](docs/APPLE_SILICON_GPU_FINDINGS.md)
 
-[inference]
-confidence_threshold = 0.5
-max_length = 512
-
-[logging]
-level = "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
-
-[server]
-# Future: HTTP API configuration
-host = "0.0.0.0"
-port = 8080
-```
-
-### .env
-
-```bash
-# API keys and secrets (never commit this file!)
-HUGGINGFACE_API_KEY=your_key_here
-AUTH_TOKEN=your_token_here
-```
-
-## Architecture
+## Repository Structure
 
 ```
-mojo-inference-service/
 ├── src/
-│   ├── main.mojo              # Entry point & CLI
-│   ├── config.mojo            # Configuration loading (TOML + .env)
-│   ├── classifier.mojo        # Simple sentiment classifier (pure Mojo)
-│   ├── embeddings.mojo        # Word embeddings & tokenization
-│   └── utils.mojo             # Helper functions
-├── data/                      # Training data & embeddings (gitignored)
-├── tests/
-│   ├── test_config.mojo
-│   ├── test_classifier.mojo
-│   └── fixtures/
-├── examples/
-│   └── example_inference.mojo
-├── benchmarks/
-│   └── compare_python.mojo    # Performance comparison
-├── config.toml                # Application configuration
-├── .env.example               # Template for secrets
-├── pixi.toml                  # Project dependencies
-└── README.md
+│   ├── python/max_distilbert/     # MAX DistilBERT implementation
+│   └── mojo/lexicon_classifier/   # Pure Mojo baseline
+├── examples/python/
+│   ├── 01_elementwise/            # Element-wise ops (CPU/GPU)
+│   ├── 02_linear_layer/           # Linear layer example
+│   └── 03_distilbert_sentiment/   # Full transformer
+├── tests/python/                  # pytest suite (21 tests)
+├── benchmarks/                    # Performance comparisons
+├── docs/
+│   ├── MAX_FRAMEWORK_GUIDE.md     # Comprehensive MAX guide
+│   ├── PROJECT_STATUS.md          # Current status & learnings
+│   ├── BLOG_DRAFT.md              # Implementation journey
+│   └── APPLE_SILICON_GPU_FINDINGS.md  # GPU experiments
+└── models/                        # Downloaded models (gitignored)
 ```
 
-## Development Roadmap
+## Completed Milestones
 
-### MVP (v0.1.0) - Pure Mojo Classifier
-- [x] Project structure
-- [ ] Configuration loading (mojo-toml + mojo-dotenv)
-- [ ] Logging setup with config-driven levels
-- [ ] Simple sentiment classifier (logistic regression)
-- [ ] Word tokenization & embeddings
-- [ ] CLI interface with argument parsing
-- [ ] Unit tests for classifier & config
-- [ ] Benchmark vs Python equivalent
+### ✅ v0.1.0 - Lexicon-based Baseline
+- Pure Mojo sentiment classifier
+- Simple lexicon-based approach
+- Benchmarking foundation
 
-### v0.2.0 - Modular MAX Integration
-- [ ] Integrate Modular MAX engine
-- [ ] Load PyTorch/TensorFlow models
-- [ ] HTTP API endpoint (using Lightbug framework)
-- [ ] Model caching & warming
-- [ ] Advanced benchmarks (MAX vs pure Mojo vs Python)
+### ✅ v0.2.0 - MAX Graph DistilBERT
+- Full MAX Graph implementation of DistilBERT
+- 5.58x speedup over PyTorch on M1
+- Comprehensive documentation & guides
+- Complete test suite (21 tests)
+- Numbered examples for learning
+- Apple Silicon GPU experiments
 
-### v0.3.0 - Production Ready
-- [ ] Batch inference support
-- [ ] Multiple model support
-- [ ] Metrics & monitoring
-- [ ] Health check endpoints
-- [ ] Docker containerization
-- [ ] Production deployment guide
+## Future Directions
+
+- **Larger models**: LLaMA, Mistral via MAX Pipeline API
+- **Batch inference**: Throughput optimisation
+- **Quantisation**: INT8/INT4 experiments
+- **More GPU work**: When matmul kernels available for Apple Silicon
 
 ## Requirements
 
-- Mojo 25.1 or later
+- MAX 25.1.0 or later
 - Pixi package manager
+- Python 3.11+ (for MAX Python API)
 
-## Dependencies
+## Key Dependencies
 
-### MVP (v0.1.0)
-- [mojo-toml](https://github.com/databooth/mojo-toml) - TOML configuration parsing
-- [mojo-dotenv](https://github.com/databooth/mojo-dotenv) - Environment variable loading
-- Mojo standard library (Logger, collections, etc.)
+- **MAX Engine**: Graph compilation and inference
+- **Transformers**: Model and tokenizer loading
+- **PyTorch**: For benchmarking comparisons
+- **pytest**: Testing framework
 
-### Future (v0.2.0+)
-- [Modular MAX](https://www.modular.com/max) - High-performance model serving
-- [Lightbug](https://github.com/saviorand/lightbug_http) - HTTP framework for Mojo
+## Learning Path
 
-## Use Cases
-
-- **Learn Mojo ML**: Understand ML inference from scratch in Mojo
-- **Configuration management**: Demonstrate best practices with mojo-toml and mojo-dotenv
-- **Performance benchmarking**: Compare pure Mojo vs Python for text classification
-- **Foundation for MAX**: Clean architecture ready for Modular MAX integration
-- **Production inference**: Path from simple classifier to high-performance serving
+1. **Start with examples**: `examples/python/README.md` has progressive learning path
+2. **Read the guides**: `docs/MAX_FRAMEWORK_GUIDE.md` explains MAX concepts
+3. **Run benchmarks**: See real performance comparisons
+4. **Explore GPU**: Apple Silicon GPU findings and limitations
+5. **Review tests**: See how to validate MAX implementations
 
 ## Sponsorship
 

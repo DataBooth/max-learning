@@ -19,9 +19,11 @@ numpy = ">=2.4.0,<3"
 pytest = ">=9.0.2,<10"
 
 [tasks]
-# Python examples (MAX Graph)
-example-minimal = "python examples/python/minimal_max_graph.py"
-example-distilbert = "python src/python/max_distilbert/inference.py"
+# Python examples (MAX Graph) - numbered progression
+example-elementwise-cpu = "python examples/python/01_elementwise/elementwise.py --device cpu"
+example-elementwise-gpu = "python examples/python/01_elementwise/elementwise.py --device gpu"
+example-linear = "python examples/python/02_linear_layer/linear_layer.py"
+example-distilbert = "python examples/python/03_distilbert_sentiment/distilbert_sentiment.py"
 
 # Benchmarking
 benchmark = "python benchmarks/distilbert_max_vs_hf.py"

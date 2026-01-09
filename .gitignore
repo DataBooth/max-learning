@@ -29,6 +29,7 @@ models/*/
 inference-service
 __pycache__/
 *.pyc
+kgen*
 
 # Pixi
 .pixi/
