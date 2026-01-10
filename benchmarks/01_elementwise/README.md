@@ -24,6 +24,7 @@ Benchmarks comparing CPU vs GPU performance for simple element-wise operations i
 - Tensor size: 4 elements
 - Warmup: 100 iterations
 - Benchmark: 1000 iterations
+- Configurable via `benchmark_config.toml`
 
 **Run**:
 ```bash
@@ -31,6 +32,14 @@ pixi run benchmark-elementwise
 # or
 python benchmarks/01_elementwise/cpu_vs_gpu.py
 ```
+
+**Output formats**:
+- Console (summary)
+- JSON (structured data)
+- CSV (tabular data)
+- Markdown (report)
+
+Results saved to `results/cpu_vs_gpu_MACHINE_YYYYMMDD_HHMMSS.*`
 
 **Expected outcome**: CPU significantly faster due to GPU dispatch overhead for tiny tensors.
 
@@ -79,6 +88,37 @@ From M1 Pro testing:
 - Small tensors fit entirely in CPU cache
 - Element-wise ops don't benefit from GPU parallelism at these sizes
 - Would need much larger tensors or more complex compute patterns
+
+---
+
+## Configuration
+
+The benchmark is fully configurable via `benchmark_config.toml`:
+
+**Adjustable parameters**:
+- `warmup_iterations` - Number of warmup iterations (default: 100)
+- `test_iterations` - Number of benchmark iterations (default: 1000)
+- `multiplier` / `offset` - Graph computation parameters
+- `input_size` - Tensor size (default: 4 elements)
+- `input_values` - Test input data
+- `cpu_enabled` / `gpu_enabled` - Toggle CPU/GPU benchmarks
+
+**Precision settings**:
+- `latency_sigfigs` - Significant figures for latency (default: 3)
+- `throughput_sigfigs` - Significant figures for throughput (default: 3)
+- `ratio_sigfigs` - Significant figures for ratios/CV (default: 3)
+
+---
+
+## Features
+
+- ✅ **Progress bars** - Visual feedback with tqdm showing warmup/benchmark progress
+- ✅ **Configurable precision** - Results formatted with appropriate significant figures
+- ✅ **Multiple output formats** - Markdown, JSON, CSV for different use cases
+- ✅ **Size scaling analysis** - Separate benchmark tests performance across tensor sizes
+- ✅ **Machine identification** - Results include machine ID in filename
+
+---
 
 ## See Also
 
