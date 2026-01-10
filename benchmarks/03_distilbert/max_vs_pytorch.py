@@ -9,17 +9,22 @@ Usage:
 import argparse
 import importlib
 import json
-import statistics
+import platform
+import sys
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
 import numpy as np
+import psutil
 import tomli
-from transformers import pipeline
 
+# Add project root to path for imports
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 @dataclass
 class BenchmarkResult:
@@ -441,20 +446,23 @@ def main():
     with open(args.config, 'rb') as f:
         config = tomli.load(f)
     
+    # Resolve paths relative to config file location
+    config_dir = args.config.parent
+    
     print("="*70)
     print(config['benchmark']['name'])
     print(config['benchmark']['description'])
     print("="*70)
     
-    # Load test data
+    # Load test data (resolve paths relative to config)
     test_data = load_test_data(
-        Path(config['test_data']['benchmark_file']),
+        config_dir / config['test_data']['benchmark_file'],
         repeat=config['test_data']['repeat'],
         categories=config['test_data'].get('categories')
     )
     
     validation_data = load_test_data(
-        Path(config['test_data']['validation_file'])
+        config_dir / config['test_data']['validation_file']
     )
     
     print(f"\nTest data loaded:")
@@ -474,9 +482,10 @@ def main():
         print(f"Loading: {impl_config['name']}")
         print(f"{'='*70}")
         
-        # Load implementation
+        # Load implementation (resolve model path relative to project root)
         load_start = time.perf_counter()
-        model, predict_fn = ImplementationLoader.load(impl_config, config['model']['path'])
+        model_path = config_dir / config['model']['path']
+        model, predict_fn = ImplementationLoader.load(impl_config, str(model_path))
         load_time = time.perf_counter() - load_start
         print(f"Loaded in {load_time:.2f} seconds")
         
@@ -509,9 +518,10 @@ def main():
     if 'console' in config['output']['formats']:
         print_results(results, baseline_name=config['output'].get('baseline'))
     
-    # Save results
+    # Save results (resolve output dir relative to config)
     if config['benchmark'].get('save_results'):
-        save_results(results, config, Path(config['benchmark']['results_dir']), all_validation_results)
+        output_dir = config_dir / config['benchmark']['results_dir']
+        save_results(results, config, output_dir, all_validation_results)
     
     print("\n" + "="*70)
     print("BENCHMARK COMPLETE")
