@@ -10,12 +10,19 @@ Run:
   pixi run benchmark-linear
 """
 
+import sys
 import time
+import tomllib
 import numpy as np
+from pathlib import Path
 from max.driver import Accelerator, CPU, Tensor
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
+
+# Add benchmarks/ to path for benchmark_utils
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from benchmark_utils import generate_markdown_report, save_markdown_report
 
 
 def build_linear_layer_graph(device_type: str, batch_size: int, 
@@ -50,13 +57,18 @@ def build_linear_layer_graph(device_type: str, batch_size: int,
     return graph
 
 
-def benchmark_device(device_type: str, batch_size: int, input_features: int, 
-                    output_features: int, iterations: int = 1000, warmup: int = 100):
+def benchmark_device(device_type: str, config: dict):
     """Benchmark linear layer on specified device."""
     
     print(f"\n{'='*60}")
     print(f"Benchmarking {device_type.upper()}")
     print(f"{'='*60}")
+    
+    iterations = config['benchmark']['test_iterations']
+    warmup = config['benchmark']['warmup_iterations']
+    batch_size = config['graph']['batch_size']
+    input_features = config['graph']['input_features']
+    output_features = config['graph']['output_features']
     
     # Initialize device
     try:
@@ -66,8 +78,9 @@ def benchmark_device(device_type: str, batch_size: int, input_features: int,
             device = CPU()
         print(f"✓ Device initialized: {device}")
     except Exception as e:
-        print(f"✗ Failed to initialize {device_type}: {e}")
-        return None
+        error_msg = f"Failed to initialize {device_type}: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Build and compile graph
     try:
@@ -76,10 +89,12 @@ def benchmark_device(device_type: str, batch_size: int, input_features: int,
         model = session.load(graph)
         print(f"✓ Graph compiled")
     except Exception as e:
-        print(f"✗ Failed to compile graph: {e}")
+        error_msg = f"Failed to compile graph: {str(e)}"
+        print(f"✗ {error_msg}")
         if device_type == "gpu" and "matmul" in str(e).lower():
+            error_msg += " (matmul kernel not available on Apple Silicon GPU)"
             print(f"  Note: matmul kernel not available on Apple Silicon GPU")
-        return None
+        return None, error_msg
     
     # Prepare input
     input_data_np = np.random.randn(batch_size, input_features).astype(np.float32)
@@ -87,18 +102,28 @@ def benchmark_device(device_type: str, batch_size: int, input_features: int,
     
     # Warmup
     print(f"\nWarming up ({warmup} iterations)...")
-    for _ in range(warmup):
-        model.execute(input_data)
+    try:
+        for _ in range(warmup):
+            model.execute(input_data)
+    except Exception as e:
+        error_msg = f"Execution failed during warmup: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Benchmark
     print(f"Running benchmark ({iterations} iterations)...")
     times = []
     
-    for _ in range(iterations):
-        start = time.perf_counter()
-        output = model.execute(input_data)
-        end = time.perf_counter()
-        times.append((end - start) * 1000)
+    try:
+        for _ in range(iterations):
+            start = time.perf_counter()
+            output = model.execute(input_data)
+            end = time.perf_counter()
+            times.append((end - start) * 1000)
+    except Exception as e:
+        error_msg = f"Execution failed during benchmark: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Calculate statistics
     times = np.array(times)
@@ -120,10 +145,6 @@ def benchmark_device(device_type: str, batch_size: int, input_features: int,
         "iterations": iterations
     }
     
-    # Verify correctness
-    output_np = output[0].to_numpy()
-    W = graph  # Would need to extract weights for verification
-    
     print(f"\nResults:")
     print(f"  Mean:       {mean_time:.4f} ms")
     print(f"  Median:     {median_time:.4f} ms")
@@ -132,7 +153,7 @@ def benchmark_device(device_type: str, batch_size: int, input_features: int,
     print(f"  Std Dev:    {std_time:.4f} ms")
     print(f"  Throughput: {throughput:.2f} req/sec")
     
-    return results
+    return results, None
 
 
 def main():
@@ -140,27 +161,40 @@ def main():
     print("Linear Layer: CPU vs GPU Benchmark")
     print("="*60)
     
-    # Configuration
-    batch_size = 32
-    input_features = 128
-    output_features = 64
-    iterations = 1000
-    warmup = 100
+    # Load configuration
+    script_dir = Path(__file__).parent
+    config_path = script_dir / "benchmark_config.toml"
     
-    print(f"\nConfiguration:")
-    print(f"  Layer: {input_features} → {output_features}")
-    print(f"  Batch size: {batch_size}")
-    print(f"  Iterations: {iterations} (warmup: {warmup})")
+    with open(config_path, 'rb') as f:
+        config = tomllib.load(f)
+    
+    print(f"\nLoaded config from: {config_path}")
+    print(f"Iterations: {config['benchmark']['test_iterations']}")
+    print(f"Warmup: {config['benchmark']['warmup_iterations']}")
+    print(f"Layer: {config['graph']['input_features']} → {config['graph']['output_features']}")
+    print(f"Batch size: {config['graph']['batch_size']}")
     
     # Benchmark CPU
-    cpu_results = benchmark_device("cpu", batch_size, input_features, output_features, 
-                                  iterations, warmup)
+    cpu_results = None
+    cpu_error = None
+    if config['devices']['cpu_enabled']:
+        result, error = benchmark_device("cpu", config)
+        cpu_results = result
+        cpu_error = error
+    else:
+        print("\nSkipping CPU benchmark (disabled in config)")
     
     # Benchmark GPU
-    gpu_results = benchmark_device("gpu", batch_size, input_features, output_features, 
-                                  iterations, warmup)
+    gpu_results = None
+    gpu_error = None
+    if config['devices']['gpu_enabled']:
+        result, error = benchmark_device("gpu", config)
+        gpu_results = result
+        gpu_error = error
+    else:
+        print("\nSkipping GPU benchmark (disabled in config)")
     
-    # Compare results
+    # Compare results (console output)
     if cpu_results and gpu_results:
         print(f"\n{'='*60}")
         print("COMPARISON")
@@ -187,6 +221,25 @@ def main():
         print(f"{'='*60}")
         print(f"\nCPU benchmark completed successfully")
         print(f"GPU benchmark failed (expected - matmul kernel not available)")
+    
+    # Generate markdown report
+    print(f"\n{'='*60}")
+    print("GENERATING REPORT")
+    print(f"{'='*60}")
+    
+    report = generate_markdown_report(
+        benchmark_name="Linear Layer: CPU vs GPU",
+        description="Compares performance of linear layer operations (matmul, add, relu) on CPU vs GPU.",
+        config=config,
+        cpu_results=cpu_results,
+        gpu_results=gpu_results,
+        gpu_error=gpu_error
+    )
+    
+    results_dir = script_dir / "results"
+    report_path = save_markdown_report(report, results_dir, prefix="cpu_vs_gpu")
+    
+    print(f"\n✓ Report saved: {report_path}")
 
 
 if __name__ == "__main__":

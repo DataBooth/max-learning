@@ -1,0 +1,27 @@
+# Element-wise Operations Benchmark Configuration
+# ================================================
+
+[benchmark]
+name = "Element-wise Operations: CPU vs GPU"
+description = "Compares CPU and GPU performance for simple element-wise operations"
+
+# Benchmark parameters
+warmup_iterations = 100
+test_iterations = 1000
+save_results = true
+results_dir = "results"
+
+[graph]
+# Element-wise computation: y = relu(x * multiplier + offset)
+multiplier = 2.0
+offset = 1.0
+input_size = 4
+
+[test_data]
+# Test input values
+input_values = [1.0, -2.0, 3.0, -4.0]
+
+[devices]
+# Which devices to benchmark
+cpu_enabled = true
+gpu_enabled = true  # Will fail gracefully if GPU kernels not available

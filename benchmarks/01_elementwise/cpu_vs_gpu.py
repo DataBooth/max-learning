@@ -5,39 +5,46 @@ Element-wise Operations Benchmark (CPU vs GPU)
 Compares performance of element-wise operations on CPU vs GPU.
 
 Run:
-  pixi run python examples/python/01_elementwise/benchmark_elementwise.py
+  pixi run benchmark-elementwise
 """
 
+import sys
 import time
+import tomllib
 import numpy as np
+from pathlib import Path
 from max.driver import Accelerator, CPU, Tensor
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
 
+# Add benchmarks/ to path for benchmark_utils
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from benchmark_utils import generate_markdown_report, save_markdown_report
 
-def build_elementwise_graph(device_type: str) -> Graph:
-    """Build graph: y = relu(x * 2 + 1)"""
+
+def build_elementwise_graph(device_type: str, multiplier: float, offset: float, size: int) -> Graph:
+    """Build graph: y = relu(x * multiplier + offset)"""
     device = DeviceRef(device_type)
-    input_spec = TensorType(DType.float32, shape=[4], device=device)
+    input_spec = TensorType(DType.float32, shape=[size], device=device)
     
     with Graph(f"elementwise_{device_type}", input_types=[input_spec]) as graph:
         x = graph.inputs[0].tensor
         
-        multiplier = ops.constant(
-            np.array([2.0, 2.0, 2.0, 2.0], dtype=np.float32),
+        multiplier_const = ops.constant(
+            np.full(size, multiplier, dtype=np.float32),
             dtype=DType.float32,
             device=x.device
         )
         
-        offset = ops.constant(
-            np.array([1.0, 1.0, 1.0, 1.0], dtype=np.float32),
+        offset_const = ops.constant(
+            np.full(size, offset, dtype=np.float32),
             dtype=DType.float32,
             device=x.device
         )
         
-        y = ops.mul(x, multiplier)
-        y = ops.add(y, offset)
+        y = ops.mul(x, multiplier_const)
+        y = ops.add(y, offset_const)
         y = ops.relu(y)
         
         graph.output(y)
@@ -45,12 +52,18 @@ def build_elementwise_graph(device_type: str) -> Graph:
     return graph
 
 
-def benchmark_device(device_type: str, iterations: int = 1000, warmup: int = 100):
+def benchmark_device(device_type: str, config: dict, input_data_np: np.ndarray):
     """Benchmark element-wise operations on specified device."""
     
     print(f"\n{'='*60}")
     print(f"Benchmarking {device_type.upper()}")
     print(f"{'='*60}")
+    
+    iterations = config['benchmark']['test_iterations']
+    warmup = config['benchmark']['warmup_iterations']
+    multiplier = config['graph']['multiplier']
+    offset = config['graph']['offset']
+    size = config['graph']['input_size']
     
     # Initialize device
     try:
@@ -60,37 +73,48 @@ def benchmark_device(device_type: str, iterations: int = 1000, warmup: int = 100
             device = CPU()
         print(f"✓ Device initialized: {device}")
     except Exception as e:
-        print(f"✗ Failed to initialize {device_type}: {e}")
-        return None
+        error_msg = f"Failed to initialize {device_type}: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Build and compile graph
     try:
-        graph = build_elementwise_graph(device_type)
+        graph = build_elementwise_graph(device_type, multiplier, offset, size)
         session = InferenceSession(devices=[device])
         model = session.load(graph)
         print(f"✓ Graph compiled")
     except Exception as e:
-        print(f"✗ Failed to compile graph: {e}")
-        return None
+        error_msg = f"Failed to compile graph: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Prepare input
-    input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
     input_data = Tensor.from_numpy(input_data_np).to(device)
     
     # Warmup
     print(f"\nWarming up ({warmup} iterations)...")
-    for _ in range(warmup):
-        model.execute(input_data)
+    try:
+        for _ in range(warmup):
+            model.execute(input_data)
+    except Exception as e:
+        error_msg = f"Execution failed during warmup: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Benchmark
     print(f"Running benchmark ({iterations} iterations)...")
     times = []
     
-    for _ in range(iterations):
-        start = time.perf_counter()
-        output = model.execute(input_data)
-        end = time.perf_counter()
-        times.append((end - start) * 1000)  # Convert to milliseconds
+    try:
+        for _ in range(iterations):
+            start = time.perf_counter()
+            output = model.execute(input_data)
+            end = time.perf_counter()
+            times.append((end - start) * 1000)  # Convert to milliseconds
+    except Exception as e:
+        error_msg = f"Execution failed during benchmark: {str(e)}"
+        print(f"✗ {error_msg}")
+        return None, error_msg
     
     # Calculate statistics
     times = np.array(times)
@@ -114,7 +138,7 @@ def benchmark_device(device_type: str, iterations: int = 1000, warmup: int = 100
     
     # Verify correctness
     output_np = output[0].to_numpy()
-    expected = np.maximum(0, input_data_np * 2.0 + 1.0)
+    expected = np.maximum(0, input_data_np * multiplier + offset)
     correct = np.allclose(output_np, expected)
     
     print(f"\nResults:")
@@ -126,7 +150,7 @@ def benchmark_device(device_type: str, iterations: int = 1000, warmup: int = 100
     print(f"  Throughput: {throughput:.2f} req/sec")
     print(f"  Correctness: {'✓ PASS' if correct else '✗ FAIL'}")
     
-    return results
+    return results, None
 
 
 def main():
@@ -134,16 +158,43 @@ def main():
     print("Element-wise Operations: CPU vs GPU Benchmark")
     print("="*60)
     
-    iterations = 1000
-    warmup = 100
+    # Load configuration
+    script_dir = Path(__file__).parent
+    config_path = script_dir / "benchmark_config.toml"
+    
+    with open(config_path, 'rb') as f:
+        config = tomllib.load(f)
+    
+    print(f"\nLoaded config from: {config_path}")
+    print(f"Iterations: {config['benchmark']['test_iterations']}")
+    print(f"Warmup: {config['benchmark']['warmup_iterations']}")
+    print(f"Graph: y = relu(x * {config['graph']['multiplier']} + {config['graph']['offset']})")
+    print(f"Input size: {config['graph']['input_size']}")
+    
+    # Prepare test data
+    test_data = np.array(config['test_data']['input_values'], dtype=np.float32)
     
     # Benchmark CPU
-    cpu_results = benchmark_device("cpu", iterations=iterations, warmup=warmup)
+    cpu_results = None
+    cpu_error = None
+    if config['devices']['cpu_enabled']:
+        result, error = benchmark_device("cpu", config, test_data)
+        cpu_results = result
+        cpu_error = error
+    else:
+        print("\nSkipping CPU benchmark (disabled in config)")
     
     # Benchmark GPU
-    gpu_results = benchmark_device("gpu", iterations=iterations, warmup=warmup)
+    gpu_results = None
+    gpu_error = None
+    if config['devices']['gpu_enabled']:
+        result, error = benchmark_device("gpu", config, test_data)
+        gpu_results = result
+        gpu_error = error
+    else:
+        print("\nSkipping GPU benchmark (disabled in config)")
     
-    # Compare results
+    # Compare results (console output)
     if cpu_results and gpu_results:
         print(f"\n{'='*60}")
         print("COMPARISON")
@@ -171,6 +222,25 @@ def main():
         else:
             consistency_improvement = (cpu_cv / gpu_cv - 1) * 100
             print(f"  GPU is {consistency_improvement:.1f}% more consistent")
+    
+    # Generate markdown report
+    print(f"\n{'='*60}")
+    print("GENERATING REPORT")
+    print(f"{'='*60}")
+    
+    report = generate_markdown_report(
+        benchmark_name="Element-wise Operations: CPU vs GPU",
+        description="Compares performance of element-wise operations (multiply, add, relu) on CPU vs GPU.",
+        config=config,
+        cpu_results=cpu_results,
+        gpu_results=gpu_results,
+        gpu_error=gpu_error
+    )
+    
+    results_dir = script_dir / "results"
+    report_path = save_markdown_report(report, results_dir, prefix="cpu_vs_gpu")
+    
+    print(f"\n✓ Report saved: {report_path}")
 
 
 if __name__ == "__main__":

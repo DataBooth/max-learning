@@ -1,0 +1,23 @@
+# Linear Layer Benchmark Configuration
+# ======================================
+
+[benchmark]
+name = "Linear Layer: CPU vs GPU"
+description = "Compares CPU and GPU performance for linear layer (matmul + bias + relu)"
+
+# Benchmark parameters
+warmup_iterations = 100
+test_iterations = 1000
+save_results = true
+results_dir = "results"
+
+[graph]
+# Linear layer dimensions: y = relu(W @ x + b)
+batch_size = 32
+input_features = 128
+output_features = 64
+
+[devices]
+# Which devices to benchmark
+cpu_enabled = true
+gpu_enabled = true  # Will fail due to missing matmul kernel on Apple Silicon
