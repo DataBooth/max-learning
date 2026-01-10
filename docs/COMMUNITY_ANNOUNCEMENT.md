@@ -179,14 +179,56 @@ max-learning/
 
 **Note:** Progress on GPU-heavy examples is blocked until Modular releases more Apple Silicon kernels. This is a learning repository that will grow as MAX capabilities expand.
 
-## 🤝 Contributing
+## 🔍 How This Compares to Official MAX Examples
 
-We welcome:
-- **Bug reports** - What broke? How can we fix it?
-- **Performance data** - Your hardware results
-- **New examples** - Especially simple operations that work on current MAX
-- **Documentation improvements** - Clarify confusing parts
-- **GPU findings** - Any accelerator, any platform
+The official [Modular MAX repository](https://github.com/modular/modular) contains over 450,000 lines of production-grade code, including full LLM implementations (Llama 3.1) and the world's largest repository of open source CPU and GPU kernels.
+
+**This repository is different:**
+
+### What Official Examples Provide
+- Production-ready implementations at scale
+- Llama3 compatible with 20,000+ model variants on Hugging Face
+- Advanced features: serving, deployment, custom ops, multi-GPU
+- Both Python and Mojo implementations
+- Reference implementations for extending MAX
+
+### What This Repository Provides
+- **Guided learning companion** to official documentation
+- Progressive complexity: start simple, build understanding
+- **First working examples** of MAX Graph on Apple Silicon GPU
+- Detailed troubleshooting (including failures and solutions)
+- Systematic benchmarking methodology explained
+- Copy-paste code that works immediately
+
+### Positioning
+
+> **Think of this as the "learn by doing" companion to the official MAX documentation.**
+
+It bridges the gap between reading API docs and building production models, with special focus on getting started on Apple Silicon. Not a replacement for official examples, but a complement that helps you understand them better.
+
+**Recommended path:**
+1. Start here to understand MAX Graph fundamentals
+2. Move to official examples for production patterns
+3. Contribute back your learnings to both!
+
+## 🤝 Contributing & Feedback
+
+**This is a work in progress!** While tests and benchmarks are available for each example, the repository is actively evolving.
+
+**We welcome:**
+- ✅ **Bug reports** - What broke? How can we fix it?
+- ✅ **Corrections** - Spotted an error? Please let us know!
+- ✅ **Performance data** - Share your hardware results
+- ✅ **New examples** - Especially simple operations that work on current MAX
+- ✅ **Documentation improvements** - Help make things clearer
+- ✅ **GPU findings** - Any accelerator, any platform
+- ✅ **Feedback** - What worked? What was confusing? What's missing?
+
+**How to contribute:**
+- Open an issue on GitHub for bugs or suggestions
+- Start a discussion for questions or ideas
+- Submit PRs for improvements (code, docs, configs)
+- Share your benchmark results from different hardware
 
 See issues on GitHub or start a discussion!
 
