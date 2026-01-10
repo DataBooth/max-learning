@@ -3,7 +3,7 @@
 
 [benchmark]
 name = "DistilBERT Sentiment Analysis Benchmark"
-description = "Performance comparison: MAX Engine vs HuggingFace PyTorch"
+description = "Performance comparison: MAX Engine vs HuggingFace PyTorch (CPU & MPS GPU)"
 warmup_iterations = 100
 test_iterations = 1000
 save_results = true
@@ -45,7 +45,7 @@ type = "huggingface_pipeline"
 device = "cpu"
 
 [implementations.huggingface_mps]
-enabled = false  # Enable for Apple Silicon GPU testing
+enabled = true  # Apple Silicon GPU testing
 name = "HuggingFace (PyTorch MPS)"
 description = "Transformers pipeline on Apple Silicon GPU"
 type = "huggingface_pipeline"

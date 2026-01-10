@@ -2,13 +2,23 @@
 
 Benchmarks comparing MAX Graph vs PyTorch (HuggingFace) performance for DistilBERT sentiment classification.
 
+Compares three implementations:
+- **MAX Engine** - Custom MAX Graph implementation (CPU)
+- **PyTorch CPU** - HuggingFace Transformers on CPU
+- **PyTorch MPS** - HuggingFace Transformers on Apple Silicon GPU
+
 ## Benchmarks
 
 ### max_vs_pytorch.py
 
-**Purpose**: Compare MAX Graph custom implementation against HuggingFace PyTorch for production inference workloads.
+**Purpose**: Compare MAX Graph custom implementation against HuggingFace PyTorch (CPU and Apple Silicon GPU) for production inference workloads.
 
 **Model**: DistilBERT fine-tuned for binary sentiment classification (positive/negative)
+
+**Implementations tested**:
+- MAX Engine (custom MAX Graph, CPU)
+- HuggingFace PyTorch CPU
+- HuggingFace PyTorch MPS (Apple Silicon GPU)
 
 **What it measures**:
 - Mean inference latency
@@ -19,9 +29,11 @@ Benchmarks comparing MAX Graph vs PyTorch (HuggingFace) performance for DistilBE
 - Prediction accuracy on validation set
 
 **Configuration**:
-- Warmup: 10 iterations
-- Benchmark: 100 iterations
-- Benchmark dataset: `benchmark_data/sentiment_benchmark.jsonl`
+- Warmup: 100 iterations
+- Benchmark: 1000 iterations
+- Benchmark dataset: 50 samples × 20 repeats = 1000 samples
+- Validation dataset: 30 samples for correctness testing
+- Configurable via `benchmark_config.toml` (enable/disable implementations)
 
 **Run**:
 ```bash
@@ -42,51 +54,70 @@ Results saved to `results/benchmark_YYYYMMDD_HHMMSS.*`
 
 ## Key Findings
 
-From M1 Pro testing (100 iterations):
+From M1 Pro testing (1000 iterations):
 
-| Metric | MAX | PyTorch | Improvement |
-|--------|-----|---------|-------------|
-| **Mean latency** | 45.88 ms | 255.85 ms | **5.58x faster** |
-| **Throughput** | 21.80 req/sec | 3.91 req/sec | **5.58x higher** |
-| **P95 latency** | 67.61 ms | 451.75 ms | **85% better** |
-| **Consistency (CV)** | 0.34 | 2.71 | **8x more consistent** |
-| **Accuracy** | 80% | 80% | **Identical** |
+| Implementation | Mean Latency | Throughput | P95 Latency | Accuracy |
+|----------------|--------------|------------|-------------|----------|
+| **PyTorch MPS (GPU)** 🏆 | 12.3 ms | 81.4 req/s | 17.7 ms | 96.7% |
+| **MAX Engine (CPU)** | 26.1 ms | 38.3 req/s | 35.6 ms | 96.7% |
+| **PyTorch CPU** | 50.1 ms | 20.0 req/s | 74.5 ms | 96.7% |
 
-### Why MAX is Faster
+### Performance Analysis
 
-1. **Ahead-of-time compilation**: Graph is compiled once, optimised for target hardware
-2. **Minimal overhead**: No Python interpreter overhead during inference
-3. **Memory efficiency**: Optimised tensor memory layout
-4. **Hardware-specific optimisations**: Tailored to M1 architecture
+**PyTorch MPS (GPU) is fastest**:
+- 2.1× faster than MAX Engine
+- 4.1× faster than PyTorch CPU
+- Leverages Apple Silicon GPU (Metal Performance Shaders)
+- Best for single-inference latency
+
+**MAX Engine vs PyTorch CPU**:
+- MAX is 1.9× faster than PyTorch CPU
+- Better consistency (lower tail latency)
+- Ahead-of-time compilation with hardware optimisations
+- No Python interpreter overhead during inference
 
 ### Trade-offs
 
-**MAX advantages**:
-- ✅ Significantly faster inference
-- ✅ Lower tail latency (more predictable)
-- ✅ Better for production serving
+**PyTorch MPS (GPU)**:
+- ✅ Fastest single-inference latency
+- ✅ Highest throughput
+- ✅ Easy to enable (just set `device="mps"`)
+- ⚠️ Apple Silicon only
+- ⚠️ Limited to models that fit in GPU memory
+
+**MAX Engine**:
+- ✅ 2× faster than PyTorch CPU
+- ✅ Consistent performance (low tail latency)
 - ✅ Framework portability (not locked to PyTorch)
+- ✅ CPU-only, works anywhere
+- ⚠️ Requires graph compilation step
 
-**PyTorch advantages**:
-- ✅ Faster prototyping (no compilation step)
-- ✅ Larger ecosystem
-- ✅ More model availability
+**PyTorch CPU**:
+- ✅ Fastest prototyping (no compilation)
+- ✅ Largest ecosystem and model availability
 - ✅ Dynamic computation graphs
+- ⚠️ Slowest inference performance
 
-### When to Use MAX
+### When to Use Each
 
-**Good fit**:
-- Production inference services
-- High-throughput batch processing
-- Latency-sensitive applications
-- Need for hardware portability
+**Use PyTorch MPS (GPU) when**:
+- Running on Apple Silicon (M1/M2/M3)
+- Need absolute lowest latency
+- Model fits in GPU memory
+- Single or small batch inference
+
+**Use MAX Engine when**:
+- Need CPU-only deployment
+- Require consistent/predictable latency
+- Want framework portability
+- Production inference services on any hardware
 - Long-running services (compilation overhead amortised)
 
-**Less ideal**:
-- One-off predictions
-- Rapid prototyping
+**Use PyTorch CPU when**:
+- Rapid prototyping and experimentation
 - Frequently changing models
-- Research experimentation
+- Need dynamic computation graphs
+- Research and development
 
 ---
 
