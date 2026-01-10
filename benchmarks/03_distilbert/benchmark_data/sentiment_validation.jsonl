@@ -3,3 +3,28 @@
 {"text": "It was okay.", "expected_label": "NEGATIVE"}
 {"text": "Best thing I've ever bought!", "expected_label": "POSITIVE"}
 {"text": "Complete disaster.", "expected_label": "NEGATIVE"}
+{"text": "Absolutely love it!", "expected_label": "POSITIVE"}
+{"text": "Worst purchase ever.", "expected_label": "NEGATIVE"}
+{"text": "Highly recommended!", "expected_label": "POSITIVE"}
+{"text": "Very disappointed.", "expected_label": "NEGATIVE"}
+{"text": "Incredible quality!", "expected_label": "POSITIVE"}
+{"text": "Total waste of time.", "expected_label": "NEGATIVE"}
+{"text": "Exceeded expectations.", "expected_label": "POSITIVE"}
+{"text": "Not what I expected.", "expected_label": "NEGATIVE"}
+{"text": "Simply brilliant!", "expected_label": "POSITIVE"}
+{"text": "Completely useless.", "expected_label": "NEGATIVE"}
+{"text": "Works perfectly as described.", "expected_label": "POSITIVE"}
+{"text": "Broke after one use.", "expected_label": "NEGATIVE"}
+{"text": "Outstanding service and quality.", "expected_label": "POSITIVE"}
+{"text": "Poor quality and overpriced.", "expected_label": "NEGATIVE"}
+{"text": "Could not be happier with this purchase!", "expected_label": "POSITIVE"}
+{"text": "Would not recommend to anyone.", "expected_label": "NEGATIVE"}
+{"text": "This is exactly what I needed.", "expected_label": "POSITIVE"}
+{"text": "Arrived damaged and unusable.", "expected_label": "NEGATIVE"}
+{"text": "Five stars all the way!", "expected_label": "POSITIVE"}
+{"text": "Misleading description.", "expected_label": "NEGATIVE"}
+{"text": "Great value for money.", "expected_label": "POSITIVE"}
+{"text": "Customer service was terrible.", "expected_label": "NEGATIVE"}
+{"text": "Will definitely buy again.", "expected_label": "POSITIVE"}
+{"text": "Save your money and look elsewhere.", "expected_label": "NEGATIVE"}
+{"text": "Impressed with the attention to detail.", "expected_label": "POSITIVE"}
