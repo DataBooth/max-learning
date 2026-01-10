@@ -274,8 +274,8 @@ pixi run benchmark-elementwise
 pixi run benchmark-elementwise-sizes
 
 # Or run directly
-python benchmarks/01_elementwise/benchmark_elementwise.py
-python benchmarks/01_elementwise/benchmark_sizes.py
+python benchmarks/01_elementwise/cpu_vs_gpu.py
+python benchmarks/01_elementwise/cpu_vs_gpu_scaling.py
 ```
 
 See [Apple Silicon GPU Findings](../../../docs/APPLE_SILICON_GPU_FINDINGS.md) for detailed results.
