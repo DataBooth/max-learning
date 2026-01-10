@@ -3,7 +3,7 @@ authors = ["Michael Booth <michael@databooth.com.au>"]
 channels = ["conda-forge", "https://conda.modular.com/max-nightly"]
 name = "max-learning"
 platforms = ["osx-arm64", "linux-64"]
-version = "0.2.0"
+version = "0.3.0"
 
 [activation]
 env = { MOJO_PATH = "$PIXI_PROJECT_ROOT/src:$HOME/code/github/databooth/mojo-toml/src:$HOME/code/github/databooth/mojo-dotenv/src" }
@@ -19,17 +19,20 @@ numpy = ">=2.4.0,<3"
 pytest = ">=9.0.2,<10"
 
 [tasks]
+# Setup
+download-models = "bash models/download_models.sh"
+
 # Python examples (MAX Graph) - numbered progression
 example-elementwise-cpu = "python examples/python/01_elementwise/elementwise.py --device cpu"
 example-elementwise-gpu = "python examples/python/01_elementwise/elementwise.py --device gpu"
 example-linear = "python examples/python/02_linear_layer/linear_layer.py"
-example-distilbert = "python examples/python/03_distilbert_sentiment/distilbert_sentiment.py"
+example-distilbert = { depends-on = ["download-models"], cmd = "python examples/python/03_distilbert_sentiment/distilbert_sentiment.py" }
 
 # Benchmarking
 benchmark-elementwise = "python benchmarks/01_elementwise/cpu_vs_gpu.py"
 benchmark-elementwise-sizes = "python benchmarks/01_elementwise/cpu_vs_gpu_scaling.py"
 benchmark-linear = "python benchmarks/02_linear_layer/cpu_vs_gpu.py"
-benchmark-distilbert = "python benchmarks/03_distilbert/max_vs_pytorch.py"
+benchmark-distilbert = { depends-on = ["download-models"], cmd = "python benchmarks/03_distilbert/max_vs_pytorch.py" }
 
 # Mojo lexicon classifier
 mojo-build = "mojo build -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/github/databooth/mojo-dotenv/src src/mojo/lexicon_classifier/main.mojo -o lexicon-classifier"

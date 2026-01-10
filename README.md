@@ -4,8 +4,8 @@ Learning and experimenting with Modular's MAX framework for high-performance ML 
 
 ## Status
 
-**Version**: 0.2.0  
-**Stage**: Active Experimentation
+**Version**: 0.3.0  
+**Stage**: Community Release
 
 ## What's Here
 
@@ -30,10 +30,11 @@ pixi install
 pixi run example-elementwise-cpu   # Simple ops: mul, add, relu
 pixi run example-elementwise-gpu   # Same ops on Apple Silicon GPU
 pixi run example-linear            # Linear layer (matmul + bias + relu)
-pixi run example-distilbert        # Full transformer sentiment analysis
+pixi run example-distilbert        # Full transformer (auto-downloads models first)
 
 # Run tests
-pixi run test                      # Full pytest suite (21 tests)
+pixi run test-python               # Full pytest suite (30 tests)
+pixi run test-mojo                 # Mojo tests
 
 # Run benchmarks
 pixi run benchmark-elementwise     # Element-wise: CPU vs GPU
@@ -89,9 +90,17 @@ pixi run benchmark-distilbert      # DistilBERT: MAX vs PyTorch
 - Full MAX Graph implementation of DistilBERT
 - 5.58x speedup over PyTorch on M1
 - Comprehensive documentation & guides
-- Complete test suite (21 tests)
+- Complete test suite (30 tests)
 - Numbered examples for learning
 - Apple Silicon GPU experiments
+
+### ✅ v0.3.0 - Community Release
+- Systematic benchmarking with TOML configs
+- Comprehensive benchmarking guide
+- All examples use configuration files
+- Test organisation mirrors examples structure
+- Australian spelling throughout documentation
+- Ready for community feedback
 
 ## Future Directions
 

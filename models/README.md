@@ -1,6 +1,6 @@
 # Models Directory
 
-This directory contains pre-trained transformer models for sentiment analysis, loaded via MAX Engine.
+This directory contains pre-trained transformer models for sentiment analysis, loaded via MAX Graph API.
 
 ## Current Models
 
@@ -8,7 +8,8 @@ This directory contains pre-trained transformer models for sentiment analysis, l
 
 **Model**: `distilbert-base-uncased-finetuned-sst-2-english`  
 **Source**: HuggingFace  
-**Size**: ~260MB  
+**Format**: SafeTensors (for MAX Graph)  
+**Size**: ~268MB  
 **Parameters**: 66M  
 **Classes**: 2 (POSITIVE, NEGATIVE)  
 **Accuracy**: ~91% on SST-2 test set
@@ -21,50 +22,39 @@ This directory contains pre-trained transformer models for sentiment analysis, l
 ### Automatic Download (Recommended)
 
 ```bash
-./models/download_models.sh
+pixi run download-models
 ```
 
-This script will:
-1. Check if `modular` Python package is available
-2. Download the model from HuggingFace
-3. Convert to ONNX format for MAX Engine
-4. Place files in `models/distilbert-sentiment/`
+This will:
+1. Download the model from HuggingFace
+2. Save in SafeTensors format (for MAX Graph)
+3. Place files in `models/distilbert-sentiment/`
 
-### Manual Download
-
-If you prefer to download manually:
-
-```bash
-# Install dependencies
-pip install transformers torch onnx
-
-# Download and convert
-python models/convert_to_onnx.py
-```
+**Note**: Models are automatically downloaded when running `pixi run example-distilbert` or `pixi run benchmark-distilbert`.
 
 ## Directory Structure
 
 ```
 models/
 ├── README.md                    # This file
-├── download_models.sh           # Download script
-├── convert_to_onnx.py          # Conversion utility
+├── download_models.sh           # Download wrapper script
+├── download_models.py           # Python download script
 └── distilbert-sentiment/       # Downloaded model (gitignored)
-    ├── model.onnx               # ONNX format for MAX Engine
+    ├── model.safetensors        # Model weights (SafeTensors format)
     ├── vocab.txt                # Vocabulary (30,522 tokens)
     ├── config.json              # Model configuration
     └── tokenizer_config.json    # Tokenizer settings
 ```
 
-## Using Models with MAX Engine
+## Using Models with MAX Graph
 
-Models are loaded in `src/max_classifier.mojo`:
+Models are loaded in `src/python/max_distilbert/inference.py`:
 
-```mojo
-from max import engine
+```python
+from max.graph.weights import load_weights
 
-var session = engine.InferenceSession()
-var model = session.load("models/distilbert-sentiment/model.onnx")
+# Load SafeTensors weights
+weights = load_weights(["models/distilbert-sentiment/model.safetensors"])
 ```
 
 ## Model Performance
@@ -80,33 +70,33 @@ var model = session.load("models/distilbert-sentiment/model.onnx")
 
 To add a new sentiment model:
 
-1. Download from HuggingFace
-2. Convert to ONNX: `python -m transformers.onnx --model=<model-name> models/<model-name>/`
-3. Update `src/max_classifier.mojo` to support the new model
-4. Add configuration in `config.toml`
-5. Update this README
+1. Download from HuggingFace with SafeTensors format
+2. Update `src/python/max_distilbert/` to support the new model
+3. Add configuration in example/benchmark config files
+4. Update this README
 
 ## Troubleshooting
 
 ### Model Not Found
 
 If you see "Model not found" errors:
-- Run `./models/download_models.sh` to download
-- Check that `models/distilbert-sentiment/model.onnx` exists
+- Run `pixi run download-models` to download
+- Check that `models/distilbert-sentiment/model.safetensors` exists
 - Verify file permissions
 
-### ONNX Conversion Fails
+### Download Fails
 
-If ONNX conversion fails:
-- Install required packages: `pip install transformers torch onnx optimum`
-- Use the optimum library: `optimum-cli export onnx --model distilbert-base-uncased-finetuned-sst-2-english models/distilbert-sentiment/`
+If model download fails:
+- Ensure you have internet connection
+- Check HuggingFace is accessible
+- Verify `transformers` package is installed in pixi environment
 
-### MAX Engine Load Error
+### MAX Graph Load Error
 
-If MAX Engine can't load the model:
-- Verify ONNX file is valid: `python -m onnx models/distilbert-sentiment/model.onnx`
-- Check MAX Engine version compatibility
-- Try PyTorch format instead: keep `pytorch_model.bin`
+If MAX Graph can't load the model:
+- Verify SafeTensors file exists and is valid
+- Check MAX version compatibility (requires MAX 25.1.0+)
+- Review `src/python/max_distilbert/inference.py` for correct paths
 
 ## References
 
