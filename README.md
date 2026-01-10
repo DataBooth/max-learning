@@ -36,9 +36,17 @@ pixi run example-distilbert        # Full transformer (auto-downloads models fir
 pixi run test-python               # Full pytest suite (30 tests)
 pixi run test-mojo                 # Mojo tests
 
-# Run benchmarks
+# Run benchmarks (generates MD + JSON + CSV reports)
 pixi run benchmark-elementwise     # Element-wise: CPU vs GPU
+pixi run benchmark-linear          # Linear layer: CPU vs GPU
 pixi run benchmark-distilbert      # DistilBERT: MAX vs PyTorch
+pixi run benchmark-all             # Run all benchmarks
+
+# Cleanup benchmark reports
+pixi run clean-reports-md          # Remove Markdown reports
+pixi run clean-reports-json        # Remove JSON reports
+pixi run clean-reports-csv         # Remove CSV reports
+pixi run clean-reports-all         # Remove all reports
 ```
 
 ## Performance Results

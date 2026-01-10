@@ -48,3 +48,9 @@ test-all = { depends-on = ["test-python"] }  # Add test-mojo when implemented
 mojo-version = "mojo --version"
 mojo-format = "mojo format src/mojo/ tests/mojo/"
 mojo-check = "mojo check src/mojo/ tests/mojo/"
+
+# Cleanup
+clean-reports-md = "bash benchmarks/clean_reports.sh md"
+clean-reports-json = "bash benchmarks/clean_reports.sh json"
+clean-reports-csv = "bash benchmarks/clean_reports.sh csv"
+clean-reports-all = "bash benchmarks/clean_reports.sh all"
