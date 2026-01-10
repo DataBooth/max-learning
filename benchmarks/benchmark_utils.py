@@ -32,6 +32,27 @@ def get_gpu_info() -> str:
         return "Unknown"
 
 
+def get_machine_id() -> str:
+    """Get a short machine identifier for filenames.
+    
+    Returns a sanitised string like 'm1-pro', 'm2-max', etc.
+    """
+    gpu = get_gpu_info().lower()
+    
+    # Extract chip identifier from GPU info
+    if 'apple' in gpu:
+        # e.g. "Apple M1 Pro" -> "m1-pro"
+        parts = gpu.replace('apple', '').strip().split()
+        return '-'.join(parts).replace(' ', '-')
+    elif 'unknown' in gpu or not gpu:
+        # Fallback to machine architecture
+        machine = platform.machine().lower()
+        return machine
+    else:
+        # Generic GPU identifier
+        return gpu.split()[0].lower()
+
+
 def get_system_info() -> Dict[str, str]:
     """Collect system information for benchmark reports."""
     return {
@@ -196,7 +217,7 @@ def generate_markdown_report(
 
 def save_markdown_report(report: str, output_dir: Path, prefix: str = "benchmark") -> Path:
     """
-    Save markdown report with timestamp.
+    Save markdown report with timestamp and machine identifier.
     
     Args:
         report: Markdown content
@@ -207,8 +228,9 @@ def save_markdown_report(report: str, output_dir: Path, prefix: str = "benchmark
         Path to saved file
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    machine_id = get_machine_id()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{prefix}_{timestamp}.md"
+    filename = f"{prefix}_{machine_id}_{timestamp}.md"
     filepath = output_dir / filename
     
     with open(filepath, 'w') as f:

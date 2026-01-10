@@ -28,6 +28,13 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# Add benchmarks directory to path for shared utilities
+BENCHMARKS_DIR = Path(__file__).parent.parent
+if str(BENCHMARKS_DIR) not in sys.path:
+    sys.path.insert(0, str(BENCHMARKS_DIR))
+
+from benchmark_utils import get_machine_id
+
 @dataclass
 class BenchmarkResult:
     """Results from benchmarking a single implementation."""
@@ -399,8 +406,9 @@ def save_results(results: list[BenchmarkResult], config: dict, output_dir: Path,
     """Save results to files."""
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    machine_id = get_machine_id()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    base_name = f"benchmark_{timestamp}" if config['benchmark'].get('timestamp_results') else "benchmark"
+    base_name = f"benchmark_{machine_id}_{timestamp}" if config['benchmark'].get('timestamp_results') else "benchmark"
     
     # JSON output
     if 'json' in config['output']['formats']:
