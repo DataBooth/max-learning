@@ -40,7 +40,7 @@ mojo-run = "mojo run -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/
 
 # Testing
 test-mojo = "mojo test tests/mojo/"
-test-python = "pytest tests/python/"
+test-python = { depends-on = ["download-models"], cmd = "pytest tests/python/" }
 
 # Development tools
 mojo-version = "mojo --version"
