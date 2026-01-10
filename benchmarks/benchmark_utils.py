@@ -7,6 +7,7 @@ Common functions for benchmark configuration, reporting, and error handling.
 
 import csv
 import json
+import math
 import platform
 import psutil
 import subprocess
@@ -53,6 +54,32 @@ def get_machine_id() -> str:
     else:
         # Generic GPU identifier
         return gpu.split()[0].lower()
+
+
+def format_sigfigs(value: float, sigfigs: int) -> str:
+    """Format a number to specified significant figures.
+    
+    Args:
+        value: Number to format
+        sigfigs: Number of significant figures
+    
+    Returns:
+        Formatted string with appropriate precision
+    """
+    if value == 0:
+        return "0"
+    
+    # Calculate magnitude
+    magnitude = math.floor(math.log10(abs(value)))
+    decimals = sigfigs - magnitude - 1
+    
+    # Format with appropriate decimal places
+    if decimals < 0:
+        # Large numbers: round to appropriate place
+        rounded = round(value, decimals)
+        return f"{rounded:.0f}"
+    else:
+        return f"{value:.{decimals}f}"
 
 
 def get_system_info() -> Dict[str, str]:
@@ -140,17 +167,21 @@ def generate_markdown_report(
             config_lines.append("")
     config_toml_str = "\n".join(config_lines)
     
+    # Get precision settings from config
+    lat_sf = config.get('output', {}).get('latency_sigfigs', 3)
+    thr_sf = config.get('output', {}).get('throughput_sigfigs', 3)
+    
     # CPU results
     if cpu_results:
         cpu_lines = [
             "| Metric | Value |",
             "|--------|-------|",
-            f"| Mean Latency | {cpu_results['mean_ms']:.4f} ms |",
-            f"| Median Latency | {cpu_results['median_ms']:.4f} ms |",
-            f"| P95 Latency | {cpu_results['p95_ms']:.4f} ms |",
-            f"| P99 Latency | {cpu_results['p99_ms']:.4f} ms |",
-            f"| Std Dev | {cpu_results['std_ms']:.4f} ms |",
-            f"| Throughput | {cpu_results['throughput']:.2f} req/sec |",
+            f"| Mean Latency | {format_sigfigs(cpu_results['mean_ms'], lat_sf)} ms |",
+            f"| Median Latency | {format_sigfigs(cpu_results['median_ms'], lat_sf)} ms |",
+            f"| P95 Latency | {format_sigfigs(cpu_results['p95_ms'], lat_sf)} ms |",
+            f"| P99 Latency | {format_sigfigs(cpu_results['p99_ms'], lat_sf)} ms |",
+            f"| Std Dev | {format_sigfigs(cpu_results['std_ms'], lat_sf)} ms |",
+            f"| Throughput | {format_sigfigs(cpu_results['throughput'], thr_sf)} req/sec |",
             f"| Iterations | {cpu_results['iterations']} |",
         ]
         cpu_results_str = "\n".join(cpu_lines)
@@ -162,12 +193,12 @@ def generate_markdown_report(
         gpu_lines = [
             "| Metric | Value |",
             "|--------|-------|",
-            f"| Mean Latency | {gpu_results['mean_ms']:.4f} ms |",
-            f"| Median Latency | {gpu_results['median_ms']:.4f} ms |",
-            f"| P95 Latency | {gpu_results['p95_ms']:.4f} ms |",
-            f"| P99 Latency | {gpu_results['p99_ms']:.4f} ms |",
-            f"| Std Dev | {gpu_results['std_ms']:.4f} ms |",
-            f"| Throughput | {gpu_results['throughput']:.2f} req/sec |",
+            f"| Mean Latency | {format_sigfigs(gpu_results['mean_ms'], lat_sf)} ms |",
+            f"| Median Latency | {format_sigfigs(gpu_results['median_ms'], lat_sf)} ms |",
+            f"| P95 Latency | {format_sigfigs(gpu_results['p95_ms'], lat_sf)} ms |",
+            f"| P99 Latency | {format_sigfigs(gpu_results['p99_ms'], lat_sf)} ms |",
+            f"| Std Dev | {format_sigfigs(gpu_results['std_ms'], lat_sf)} ms |",
+            f"| Throughput | {format_sigfigs(gpu_results['throughput'], thr_sf)} req/sec |",
             f"| Iterations | {gpu_results['iterations']} |",
         ]
         gpu_results_str = "\n".join(gpu_lines)
@@ -181,6 +212,8 @@ def generate_markdown_report(
     # Comparison
     comparison_str = ""
     if cpu_results and gpu_results:
+        ratio_sf = config.get('output', {}).get('ratio_sigfigs', 3)
+        
         speedup = cpu_results["mean_ms"] / gpu_results["mean_ms"]
         cpu_cv = cpu_results["std_ms"] / cpu_results["mean_ms"]
         gpu_cv = gpu_results["std_ms"] / gpu_results["mean_ms"]
@@ -188,11 +221,11 @@ def generate_markdown_report(
         comp_lines = [
             "## Comparison",
             "",
-            f"- **Speedup**: {speedup:.2f}x",
-            f"- **GPU is {speedup:.2f}x {'faster' if speedup > 1 else 'slower'} than CPU**",
+            f"- **Speedup**: {format_sigfigs(speedup, ratio_sf)}x",
+            f"- **GPU is {format_sigfigs(speedup, ratio_sf)}x {'faster' if speedup > 1 else 'slower'} than CPU**",
             "",
-            f"- **CPU Consistency (CV)**: {cpu_cv:.4f}",
-            f"- **GPU Consistency (CV)**: {gpu_cv:.4f}",
+            f"- **CPU Consistency (CV)**: {format_sigfigs(cpu_cv, ratio_sf)}",
+            f"- **GPU Consistency (CV)**: {format_sigfigs(gpu_cv, ratio_sf)}",
         ]
         
         if cpu_cv < gpu_cv:

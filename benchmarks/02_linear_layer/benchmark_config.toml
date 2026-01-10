@@ -11,6 +11,12 @@ test_iterations = 1000
 save_results = true
 results_dir = "results"
 
+[output]
+# Reporting precision (significant figures)
+latency_sigfigs = 3      # e.g., 0.0325 ms, 1.23 ms
+throughput_sigfigs = 3   # e.g., 30700 req/s, 965 req/s
+ratio_sigfigs = 3        # e.g., 1.45x speedup, CV 0.341
+
 [graph]
 # Linear layer dimensions: y = relu(W @ x + b)
 batch_size = 32
@@ -20,4 +26,4 @@ output_features = 64
 [devices]
 # Which devices to benchmark
 cpu_enabled = true
-gpu_enabled = true  # Will fail due to missing matmul kernel on Apple Silicon
+gpu_enabled = false  # If true will currently fail due to missing matmul kernel on Apple Silicon

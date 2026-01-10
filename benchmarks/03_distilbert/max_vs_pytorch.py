@@ -9,17 +9,17 @@ Usage:
 import argparse
 import importlib
 import json
-import platform
+import math
 import statistics
 import sys
 import time
+import tomllib
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
 import numpy as np
-import psutil
 import tomli
 from transformers import pipeline
 
@@ -209,6 +209,32 @@ def validate_implementation(
     return results
 
 
+def format_sigfigs(value: float, sigfigs: int) -> str:
+    """Format a number to specified significant figures.
+    
+    Args:
+        value: Number to format
+        sigfigs: Number of significant figures
+    
+    Returns:
+        Formatted string with appropriate precision
+    """
+    if value == 0:
+        return "0"
+    
+    # Calculate magnitude
+    magnitude = math.floor(math.log10(abs(value)))
+    decimals = sigfigs - magnitude - 1
+    
+    # Format with appropriate decimal places
+    if decimals < 0:
+        # Large numbers: round to appropriate place
+        rounded = round(value, decimals)
+        return f"{rounded:.0f}"
+    else:
+        return f"{value:.{decimals}f}"
+
+
 def print_results(results: list[BenchmarkResult], baseline_name: str | None = None):
     """Print benchmark results to console."""
     print("\n" + "="*70)
@@ -258,6 +284,13 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
     baseline = next((r for r in results if r.name == baseline_name), None) if baseline_name else None
     fastest = min(results, key=lambda r: r.mean_ms)
     
+    # Get precision settings
+    lat_sf = config['output'].get('latency_sigfigs', 3)
+    thr_sf = config['output'].get('throughput_sigfigs', 3)
+    ratio_sf = config['output'].get('ratio_sigfigs', 3)
+    pct_dec = config['output'].get('percentage_decimals', 1)
+    conf_dec = config['output'].get('confidence_decimals', 4)
+    
     md = []
     md.append(f"# {config['benchmark']['name']}")
     md.append("")
@@ -276,11 +309,11 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
     if comparisons:
         slowest = comparisons[0]  # Since we sort by mean
         speedup = slowest.mean_ms / fastest.mean_ms
-        md.append(f"- **{speedup:.2f}x faster** than {slowest.name}")
+        md.append(f"- **{format_sigfigs(speedup, ratio_sf)}x faster** than {slowest.name}")
         throughput_increase = ((fastest.throughput_rps / slowest.throughput_rps) - 1) * 100
-        md.append(f"- **{throughput_increase:.1f}% more throughput** than {slowest.name}")
+        md.append(f"- **{throughput_increase:.{pct_dec}f}% more throughput** than {slowest.name}")
         p95_improvement = ((slowest.p95_ms - fastest.p95_ms) / slowest.p95_ms) * 100
-        md.append(f"- **{p95_improvement:.1f}% better P95 latency** than {slowest.name}")
+        md.append(f"- **{p95_improvement:.{pct_dec}f}% better P95 latency** than {slowest.name}")
     md.append("")
     
     # Configuration
@@ -300,8 +333,10 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
     
     for result in results:
         winner_marker = " 🏆" if result == fastest else ""
-        md.append(f"| {result.name}{winner_marker} | {result.mean_ms:.2f} | {result.median_ms:.2f} | "
-                 f"{result.p95_ms:.2f} | {result.p99_ms:.2f} | {result.throughput_rps:.2f} | {result.load_time_s:.2f} |")
+        md.append(f"| {result.name}{winner_marker} | {format_sigfigs(result.mean_ms, lat_sf)} | "
+                 f"{format_sigfigs(result.median_ms, lat_sf)} | {format_sigfigs(result.p95_ms, lat_sf)} | "
+                 f"{format_sigfigs(result.p99_ms, lat_sf)} | {format_sigfigs(result.throughput_rps, thr_sf)} | "
+                 f"{format_sigfigs(result.load_time_s, ratio_sf)} |")
     md.append("")
     
     # Detailed Metrics
@@ -315,20 +350,20 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
         md.append("")
         md.append("| Metric | Value |")
         md.append("|---|---:|")
-        md.append(f"| Mean latency | {result.mean_ms:.2f} ms |")
-        md.append(f"| Median latency | {result.median_ms:.2f} ms |")
-        md.append(f"| P50 latency | {result.p50_ms:.2f} ms |")
-        md.append(f"| P95 latency | {result.p95_ms:.2f} ms |")
-        md.append(f"| P99 latency | {result.p99_ms:.2f} ms |")
-        md.append(f"| Min latency | {result.min_ms:.2f} ms |")
-        md.append(f"| Max latency | {result.max_ms:.2f} ms |")
-        md.append(f"| Std deviation | {result.std_ms:.2f} ms |")
-        md.append(f"| Throughput | {result.throughput_rps:.2f} req/sec |")
-        md.append(f"| Load time | {result.load_time_s:.2f} seconds |")
+        md.append(f"| Mean latency | {format_sigfigs(result.mean_ms, lat_sf)} ms |")
+        md.append(f"| Median latency | {format_sigfigs(result.median_ms, lat_sf)} ms |")
+        md.append(f"| P50 latency | {format_sigfigs(result.p50_ms, lat_sf)} ms |")
+        md.append(f"| P95 latency | {format_sigfigs(result.p95_ms, lat_sf)} ms |")
+        md.append(f"| P99 latency | {format_sigfigs(result.p99_ms, lat_sf)} ms |")
+        md.append(f"| Min latency | {format_sigfigs(result.min_ms, lat_sf)} ms |")
+        md.append(f"| Max latency | {format_sigfigs(result.max_ms, lat_sf)} ms |")
+        md.append(f"| Std deviation | {format_sigfigs(result.std_ms, lat_sf)} ms |")
+        md.append(f"| Throughput | {format_sigfigs(result.throughput_rps, thr_sf)} req/sec |")
+        md.append(f"| Load time | {format_sigfigs(result.load_time_s, ratio_sf)} seconds |")
         
         if baseline and baseline != result:
             speedup = baseline.mean_ms / result.mean_ms
-            md.append(f"| Speedup vs {baseline_name} | {speedup:.2f}x |")
+            md.append(f"| Speedup vs {baseline_name} | {format_sigfigs(speedup, ratio_sf)}x |")
         md.append("")
     
     # Validation Results
@@ -340,7 +375,7 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
         accuracy = 100 * correct / len(val_results)
         md.append(f"### {impl_name}")
         md.append("")
-        md.append(f"**Accuracy**: {correct}/{len(val_results)} ({accuracy:.1f}%)")
+        md.append(f"**Accuracy**: {correct}/{len(val_results)} ({accuracy:.{pct_dec}f}%)")
         md.append("")
         md.append("| Text | Expected | Predicted | Confidence | Result |")
         md.append("|---|---|---|---:|---|")
@@ -348,7 +383,7 @@ def generate_markdown_report(results: list[BenchmarkResult], config: dict, valid
         for v in val_results:
             status = "✓" if v.correct else "✗"
             text_short = v.text[:40] + "..." if len(v.text) > 40 else v.text
-            md.append(f"| {text_short} | {v.expected} | {v.predicted} | {v.confidence:.4f} | {status} |")
+            md.append(f"| {text_short} | {v.expected} | {v.predicted} | {v.confidence:.{conf_dec}f} | {status} |")
         md.append("")
     
     # System Info

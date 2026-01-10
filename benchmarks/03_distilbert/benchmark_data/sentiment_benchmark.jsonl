@@ -1,15 +1,50 @@
 {"text": "good", "expected_label": "POSITIVE", "category": "very_short"}
 {"text": "bad", "expected_label": "NEGATIVE", "category": "very_short"}
+{"text": "love", "expected_label": "POSITIVE", "category": "very_short"}
+{"text": "hate", "expected_label": "NEGATIVE", "category": "very_short"}
+{"text": "amazing", "expected_label": "POSITIVE", "category": "very_short"}
 {"text": "bad movie", "expected_label": "NEGATIVE", "category": "short"}
 {"text": "great film", "expected_label": "POSITIVE", "category": "short"}
+{"text": "poor quality", "expected_label": "NEGATIVE", "category": "short"}
+{"text": "excellent service", "expected_label": "POSITIVE", "category": "short"}
+{"text": "total disaster", "expected_label": "NEGATIVE", "category": "short"}
 {"text": "This is a great product!", "expected_label": "POSITIVE", "category": "medium"}
 {"text": "Not worth the money at all.", "expected_label": "NEGATIVE", "category": "medium"}
 {"text": "Best purchase ever!", "expected_label": "POSITIVE", "category": "medium"}
 {"text": "Highly recommend to everyone.", "expected_label": "POSITIVE", "category": "medium"}
 {"text": "Would not buy this again.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Exceeded all my expectations.", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "Very disappointed with this.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Absolutely brilliant work!", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "Worst experience ever.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Could not be happier!", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "It was okay, nothing special.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Fairly average overall.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Simply outstanding quality.", "expected_label": "POSITIVE", "category": "medium"}
+{"text": "Completely broken and useless.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "Perfect for my needs!", "expected_label": "POSITIVE", "category": "medium"}
 {"text": "I absolutely loved this movie. It was fantastic!", "expected_label": "POSITIVE", "category": "long"}
 {"text": "This movie was absolutely fantastic! I loved every minute of it.", "expected_label": "POSITIVE", "category": "long"}
 {"text": "The product quality is terrible and customer service was even worse.", "expected_label": "NEGATIVE", "category": "long"}
 {"text": "Complete waste of money and time.", "expected_label": "NEGATIVE", "category": "long"}
 {"text": "Terrible experience. Would not recommend.", "expected_label": "NEGATIVE", "category": "long"}
-{"text": "It was okay, nothing special.", "expected_label": "NEGATIVE", "category": "medium"}
+{"text": "This exceeded my expectations in every way possible.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "I'm thoroughly impressed with the attention to detail.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "The performance was lacking and very disappointing overall.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Incredible value for money, highly satisfied with my purchase.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Poorly designed and fell apart after minimal use.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Outstanding quality and delivered ahead of schedule!", "expected_label": "POSITIVE", "category": "long"}
+{"text": "The worst customer service I have ever experienced in my life.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Beautifully crafted and works perfectly as advertised.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Malfunctioned immediately and support was unhelpful.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "A truly exceptional experience from start to finish.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Frustrating to use and not worth the hassle.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "The best decision I've made this year, absolutely delighted!", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Cheap materials and shoddy construction throughout.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Flawless execution and remarkable attention to every detail.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Arrived damaged and the replacement was also defective.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Fantastic results that far surpassed what I hoped for!", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Misleading description and nothing like what was advertised.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "Superb craftsmanship and incredibly easy to use.", "expected_label": "POSITIVE", "category": "long"}
+{"text": "Constant problems and failures make this completely unreliable.", "expected_label": "NEGATIVE", "category": "long"}
+{"text": "I would recommend this to anyone without hesitation!", "expected_label": "POSITIVE", "category": "long"}
