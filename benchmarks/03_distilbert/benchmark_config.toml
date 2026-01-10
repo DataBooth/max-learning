@@ -4,8 +4,8 @@
 [benchmark]
 name = "DistilBERT Sentiment Analysis Benchmark"
 description = "Performance comparison: MAX Engine vs HuggingFace PyTorch"
-warmup_iterations = 10
-test_iterations = 100
+warmup_iterations = 100
+test_iterations = 1000
 save_results = true
 results_dir = "results"
 timestamp_results = true  # Add timestamp to result filenames
