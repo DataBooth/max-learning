@@ -21,7 +21,7 @@ Benchmarks comparing MAX Graph vs PyTorch (HuggingFace) performance for DistilBE
 **Configuration**:
 - Warmup: 10 iterations
 - Benchmark: 100 iterations
-- Test dataset: `test_data/sentiment_validation.jsonl`
+- Benchmark dataset: `benchmark_data/sentiment_benchmark.jsonl`
 
 **Run**:
 ```bash
@@ -100,12 +100,13 @@ The benchmark automatically captures:
 - OS: Operating system and architecture
 - Timestamp: When benchmark was run
 
-### Test Data
+### Benchmark Data
 
-Uses validation dataset with known ground truth labels:
-- Location: `test_data/sentiment_validation.jsonl`
+Uses benchmark and validation datasets with known ground truth labels:
+- Location: `benchmark_data/`
 - Format: JSONL (one JSON object per line)
-- Fields: `text`, `label` (0=negative, 1=positive)
+- Files: `sentiment_benchmark.jsonl`, `sentiment_validation.jsonl`
+- Fields: `text`, `expected_label`, `category` (optional)
 
 ### Metrics Explained
 

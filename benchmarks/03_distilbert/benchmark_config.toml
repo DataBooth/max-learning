@@ -15,11 +15,11 @@ path = "../../models/distilbert-sentiment"
 task = "sentiment-analysis"
 
 [test_data]
-# Path to benchmark test data (JSONL format)
-benchmark_file = "test_data/sentiment_benchmark.jsonl"  # Relative to this file
+# Path to benchmark data (JSONL format)
+benchmark_file = "benchmark_data/sentiment_benchmark.jsonl"  # Relative to this file
 
-# Path to validation test data for correctness checking
-validation_file = "test_data/sentiment_validation.jsonl"  # Relative to this file
+# Path to validation data for correctness checking
+validation_file = "benchmark_data/sentiment_validation.jsonl"  # Relative to this file
 
 # Number of times to repeat the benchmark dataset
 repeat = 10
