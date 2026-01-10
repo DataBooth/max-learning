@@ -13,6 +13,7 @@ import time
 import tomllib
 import numpy as np
 from pathlib import Path
+from tqdm import tqdm
 from max.driver import Accelerator, CPU, Tensor
 from max.dtype import DType
 from max.engine import InferenceSession
@@ -99,7 +100,7 @@ def benchmark_device(device_type: str, config: dict, input_data_np: np.ndarray):
     # Warmup
     print(f"\nWarming up ({warmup} iterations)...")
     try:
-        for _ in range(warmup):
+        for _ in tqdm(range(warmup), desc="Warmup", unit="iter", ncols=80, mininterval=0.5):
             model.execute(input_data)
     except Exception as e:
         error_msg = f"Execution failed during warmup: {str(e)}"
@@ -107,11 +108,11 @@ def benchmark_device(device_type: str, config: dict, input_data_np: np.ndarray):
         return None, error_msg
     
     # Benchmark
-    print(f"Running benchmark ({iterations} iterations)...")
+    print(f"\nRunning benchmark ({iterations} iterations)...")
     times = []
     
     try:
-        for _ in range(iterations):
+        for _ in tqdm(range(iterations), desc="Benchmark", unit="iter", ncols=80, mininterval=0.5):
             start = time.perf_counter()
             output = model.execute(input_data)
             end = time.perf_counter()

@@ -21,6 +21,7 @@ from typing import Any, Callable
 
 import numpy as np
 import tomli
+from tqdm import tqdm
 from transformers import pipeline
 
 # Add project root to path for imports
@@ -155,22 +156,19 @@ def benchmark_implementation(
     
     # Warmup
     print(f"Warming up ({warmup} iterations)...")
-    for item in test_data[:warmup]:
+    for item in tqdm(test_data[:warmup], desc="Warmup", unit="iter", ncols=80, mininterval=0.5):
         predict_fn(item['text'])
     
     # Benchmark
-    print(f"Running benchmark ({iterations} iterations)...")
+    print(f"\nRunning benchmark ({iterations} iterations)...")
     latencies = []
     
-    for i, item in enumerate(test_data[:iterations]):
+    for item in tqdm(test_data[:iterations], desc="Benchmark", unit="iter", ncols=80, mininterval=0.5):
         start = time.perf_counter()
         _ = predict_fn(item['text'])
         end = time.perf_counter()
         latency_ms = (end - start) * 1000
         latencies.append(latency_ms)
-        
-        if (i + 1) % 10 == 0:
-            print(f"  Completed {i + 1}/{iterations}...")
     
     # Calculate statistics
     return BenchmarkResult(

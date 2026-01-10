@@ -17,6 +17,7 @@ onnxruntime = ">=1.22.2,<2"
 onnxscript = ">=0.5.6,<0.6"
 numpy = ">=2.4.0,<3"
 pytest = ">=9.0.2,<10"
+tqdm = ">=4.67.1,<5"
 
 [tasks]
 # Setup
