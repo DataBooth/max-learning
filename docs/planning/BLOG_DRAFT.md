@@ -262,12 +262,75 @@ Built comprehensive benchmarking framework with 100 iterations:
 
 ## Key Learnings
 
+### Understanding "Graphs" in MAX Graph
+
+**Why is it called a "graph"?** The term is overloaded in computing, but here it refers to a **computational graph** (or **dataflow graph**)—literally a graph data structure:
+
+- **Nodes** = Operations (add, multiply, matmul, relu, etc.)
+- **Edges** = Data flow between operations (tensors)
+- **Directed Acyclic Graph (DAG)** = Operations execute in dependency order
+
+**Simple Example**: For `y = relu(x * 2 + 1)`:
+```
+Input (x)
+   │
+   ├──> [multiply by 2] ──> intermediate
+   │
+   └──> [add 1] ──> intermediate2
+        │
+        └──> [relu] ──> Output (y)
+```
+
+This isn't:
+- ❌ A chart/plot (matplotlib graph)
+- ❌ Graph theory problems (shortest path, networks)
+- ❌ Knowledge graphs or social graphs
+
+It's literally a **data structure** representing computation flow.
+
+**Why use computational graphs?**
+
+1. **Enables optimisation**: Before execution, the compiler can:
+   - Fuse operations (mul+add+relu → single kernel)
+   - Eliminate redundant computations
+   - Reorder operations for better memory access
+   - Choose optimal hardware kernels
+
+2. **Separates definition from execution**:
+   ```python
+   # Phase 1: Define the graph (what to compute)
+   with Graph("model", input_types=[...]) as graph:
+       y = ops.relu(ops.add(ops.mul(x, 2.0), 1.0))
+       graph.output(y)
+   
+   # Phase 2: Compile (optimise for hardware)
+   model = session.load(graph)
+   
+   # Phase 3: Execute (run many times, fast!)
+   output = model.execute(input_data)
+   ```
+
+**Historical context**:
+- **1960s-1970s**: Dataflow graphs for parallel computation
+- **2015**: TensorFlow popularised "computation graphs" for deep learning
+- **2016**: PyTorch introduced dynamic computational graphs
+- **Now**: Most ML frameworks use graphs internally (even if hidden)
+
+**MAX Graph vs other frameworks**:
+- **MAX Graph**: Explicit, static, ahead-of-time compiled
+- **TensorFlow 2.x**: Hidden graphs (via `@tf.function`)
+- **PyTorch**: Dynamic graphs (built during execution)
+- **ONNX**: File-based graph interchange format
+
+When you write `with Graph(...) as graph:`, you're literally constructing a directed acyclic graph of operations that MAX then compiles and optimises.
+
 ### About MAX Engine
 1. **Primary use case**: Serving GenAI/LLM models, but works great for custom architectures
 2. **Architecture**: Graph building (Python/Mojo) → compiler optimisation → hardware-agnostic execution
-3. **Mojo API maturity**: Python API is production-ready; Mojo API is experimental
-4. **ONNX support**: Custom extensions required for unsupported ops, not plug-and-play
-5. **Performance**: Significant speedups (5-6x) with better consistency than PyTorch on CPU
+3. **Computational graphs**: Explicit DAG representation enables powerful compiler optimisations
+4. **Mojo API maturity**: Python API is production-ready; Mojo API is experimental
+5. **ONNX support**: Custom extensions required for unsupported ops, not plug-and-play
+6. **Performance**: Significant speedups (1.9-5.6x) with better consistency than PyTorch on CPU
 
 ### About MAX Graph API Patterns
 1. **Linear layers**: No `ops.linear()`, use `ops.matmul(x, ops.transpose(W, 1, 0)) + bias`
