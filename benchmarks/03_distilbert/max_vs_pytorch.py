@@ -433,7 +433,7 @@ def save_results(results: list[BenchmarkResult], config: dict, output_dir: Path,
 
 def main():
     parser = argparse.ArgumentParser(description="Config-driven ML inference benchmark")
-    parser.add_argument('--config', type=Path, default='benchmark_config.toml',
+    parser.add_argument('--config', type=Path, default=Path(__file__).parent / 'benchmark.toml',
                        help='Path to TOML config file')
     args = parser.parse_args()
     

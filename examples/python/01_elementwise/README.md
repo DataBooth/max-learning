@@ -6,6 +6,8 @@ This example demonstrates the simplest MAX Graph operations, supporting both CPU
 
 ## MAX Graph API Workflow
 
+Note: Mermaid diagrams render on GitHub. For local preview in VS Code, install the "Markdown Preview Mermaid Support" extension. Raw Mermaid sources are in `docs/diagrams/*.mmd`.
+
 This example demonstrates the core MAX Graph API workflow:
 
 ```mermaid

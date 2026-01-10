@@ -65,9 +65,11 @@ pixi run benchmark-distilbert      # DistilBERT: MAX vs PyTorch
 ├── tests/python/                  # pytest suite (21 tests)
 ├── benchmarks/
 │   ├── 01_elementwise/            # CPU vs GPU benchmarks
-│   ├── 03_distilbert/             # MAX vs PyTorch benchmarks
-│   ├── results/                   # Benchmark outputs
-│   └── test_data/                 # Test datasets
+│   │   └── results/               # Benchmark outputs
+│   └── 03_distilbert/             # MAX vs PyTorch benchmarks
+│       ├── benchmark.toml         # Configuration
+│       ├── results/               # Benchmark outputs
+│       └── test_data/             # Test datasets
 ├── docs/
 │   ├── MAX_FRAMEWORK_GUIDE.md     # Comprehensive MAX guide
 │   ├── PROJECT_STATUS.md          # Current status & learnings

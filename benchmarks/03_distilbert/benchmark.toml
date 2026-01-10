@@ -7,19 +7,19 @@ description = "Performance comparison: MAX Engine vs HuggingFace PyTorch"
 warmup_iterations = 10
 test_iterations = 100
 save_results = true
-results_dir = "benchmark_results"
+results_dir = "results"
 timestamp_results = true  # Add timestamp to result filenames
 
 [model]
-path = "models/distilbert-sentiment"
+path = "../../models/distilbert-sentiment"
 task = "sentiment-analysis"
 
 [test_data]
 # Path to benchmark test data (JSONL format)
-benchmark_file = "test_data/sentiment_benchmark.jsonl"
+benchmark_file = "test_data/sentiment_benchmark.jsonl"  # Relative to this file
 
 # Path to validation test data for correctness checking
-validation_file = "test_data/sentiment_validation.jsonl"
+validation_file = "test_data/sentiment_validation.jsonl"  # Relative to this file
 
 # Number of times to repeat the benchmark dataset
 repeat = 10
@@ -32,7 +32,7 @@ enabled = true
 name = "MAX Engine"
 description = "Custom MAX Graph implementation with DistilBERT"
 type = "custom"
-module = "src.max_distilbert.inference"
+module = "src.python.max_distilbert.inference"
 class_name = "DistilBertSentimentClassifier"
 # Custom initialization args (passed to __init__)
 init_args = { model_path = "{{model.path}}" }
