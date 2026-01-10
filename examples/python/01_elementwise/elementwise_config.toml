@@ -1,0 +1,18 @@
+# Element-wise Operations Example Configuration
+# ==============================================
+# Configuration for the simple element-wise operations example.
+# Demonstrates MAX Graph with configurable parameters.
+
+[graph]
+# Graph computation: y = relu(x * multiplier + offset)
+multiplier = 2.0
+offset = 1.0
+input_size = 4
+
+[test_data]
+# Test input values (will be broadcast to input_size)
+input_values = [1.0, -2.0, 3.0, -4.0]
+
+[device]
+# Default device to use (can be overridden by --device argument)
+default = "cpu"

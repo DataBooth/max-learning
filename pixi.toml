@@ -26,7 +26,9 @@ example-linear = "python examples/python/02_linear_layer/linear_layer.py"
 example-distilbert = "python examples/python/03_distilbert_sentiment/distilbert_sentiment.py"
 
 # Benchmarking
-benchmark = "python benchmarks/distilbert_max_vs_hf.py"
+benchmark-elementwise = "python benchmarks/01_elementwise/benchmark_elementwise.py"
+benchmark-elementwise-sizes = "python benchmarks/01_elementwise/benchmark_sizes.py"
+benchmark-distilbert = "python benchmarks/03_distilbert/distilbert_max_vs_hf.py"
 
 # Mojo lexicon classifier
 mojo-build = "mojo build -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/github/databooth/mojo-dotenv/src src/mojo/lexicon_classifier/main.mojo -o lexicon-classifier"

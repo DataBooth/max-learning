@@ -1,15 +1,162 @@
-# Apple Silicon GPU Experiments
+# Element-wise Operations Example
 
 ## Overview
 
-This directory contains experiments testing MAX Graph operations on Apple Silicon GPU (M1).
+This example demonstrates the simplest MAX Graph operations, supporting both CPU and GPU execution.
+
+## MAX Graph API Workflow
+
+This example demonstrates the core MAX Graph API workflow:
+
+```mermaid
+flowchart TB
+    subgraph Config["1. Configuration"]
+        TOML["elementwise_config.toml<br/>• multiplier<br/>• offset<br/>• input_size<br/>• test_data"]
+    end
+    
+    subgraph Build["2. Graph Building"]
+        Device["DeviceRef<br/>(cpu or gpu)"]
+        InputSpec["TensorType<br/>(shape, dtype, device)"]
+        Graph["Graph Context<br/>(define computation)"]
+        Ops["Operations<br/>• ops.constant<br/>• ops.mul<br/>• ops.add<br/>• ops.relu"]
+    end
+    
+    subgraph Compile["3. Compilation"]
+        Session["InferenceSession<br/>(attach device)"]
+        Model["Compiled Model<br/>(optimized)"]
+    end
+    
+    subgraph Execute["4. Execution"]
+        Input["Input Tensor<br/>(from NumPy)"]
+        Inference["model.execute()"]
+        Output["Output Tensor<br/>(to NumPy)"]
+    end
+    
+    TOML --> Device
+    Device --> InputSpec
+    InputSpec --> Graph
+    Graph --> Ops
+    Ops --> Session
+    Session --> Model
+    Model --> Input
+    Input --> Inference
+    Inference --> Output
+    
+    style Config fill:#e1f5ff
+    style Build fill:#fff4e1
+    style Compile fill:#ffe1f5
+    style Execute fill:#e1ffe1
+```
+
+## The Problem
+
+We're computing a simple element-wise function:
+
+```
+y = relu(x * multiplier + offset)
+```
+
+Where:
+- `x` is the input vector (configurable size, default: 4 elements)
+- `multiplier` is a scalar constant (default: 2.0) broadcast to match input size
+- `offset` is a scalar constant (default: 1.0) broadcast to match input size
+- `relu` is the Rectified Linear Unit activation function
+
+### Mathematical Operations
+
+1. **Multiplication** (element-wise):
+   ```
+   z = x ⊙ multiplier
+   ```
+   Each element of x is multiplied by the multiplier value.
+   
+   Example: `[1, -2, 3, -4] * 2.0 = [2, -4, 6, -8]`
+
+2. **Addition** (element-wise):
+   ```
+   w = z + offset
+   ```
+   The offset is added to each element.
+   
+   Example: `[2, -4, 6, -8] + 1.0 = [3, -3, 7, -7]`
+
+3. **ReLU Activation**:
+   ```
+   y = max(0, w) = { w  if w > 0
+                  { 0  otherwise
+   ```
+   Negative values become zero, positive values unchanged.
+   
+   Example: `relu([3, -3, 7, -7]) = [3, 0, 7, 0]`
+
+### Complete Example
+
+With default config (`multiplier=2.0`, `offset=1.0`, `input=[1, -2, 3, -4]`):
+
+```mermaid
+graph LR
+    A["Input<br/>[1, -2, 3, -4]"] --> B["ops.mul<br/>multiply by 2.0"]
+    B --> C["[2, -4, 6, -8]"]
+    C --> D["ops.add<br/>add 1.0"]
+    D --> E["[3, -3, 7, -7]"]
+    E --> F["ops.relu<br/>max(0, x)"]
+    F --> G["Output<br/>[3, 0, 7, 0]"]
+    
+    style A fill:#e1f5ff
+    style G fill:#e1ffe1
+    style B fill:#fff4e1
+    style D fill:#fff4e1
+    style F fill:#fff4e1
+```
+
+Or in table form:
+```
+Input:     [1,  -2,   3,  -4]
+  ↓ *2
+Multiply:  [2,  -4,   6,  -8]
+  ↓ +1
+Add:       [3,  -3,   7,  -7]
+  ↓ relu
+Output:    [3,   0,   7,   0]
+```
 
 ## Files
 
-- **`elementwise_gpu.py`** - Element-wise operations (add, multiply, relu)
-- **`linear_layer.py`** - Linear layer with matmul
+- **`elementwise.py`** - Main example with TOML config support (CPU/GPU)
+- **`elementwise_config.toml`** - Configuration for multiplier, offset, and test data
 
-## Findings
+## Running the Example
+
+```bash
+# Run on CPU (default from config)
+pixi run example-elementwise-cpu
+
+# Run on GPU
+pixi run example-elementwise-gpu
+
+# Or directly with custom config
+python examples/python/01_elementwise/elementwise.py --device cpu
+python examples/python/01_elementwise/elementwise.py --device gpu --config my_config.toml
+```
+
+## Configuration
+
+Edit `elementwise_config.toml` to change parameters:
+
+```toml
+[graph]
+multiplier = 2.0  # Change computation
+offset = 1.0
+input_size = 4
+
+[test_data]
+input_values = [1.0, -2.0, 3.0, -4.0]  # Change test input
+
+[device]
+default = "cpu"  # Change default device
+```
+
+## Apple Silicon GPU Findings
 
 ### Current Status (January 2026)
 
@@ -20,7 +167,7 @@ Apple Silicon GPU support in MAX is **partial** - depends on kernel availability
 
 ### Experiment Results
 
-#### Element-wise Operations (`elementwise_gpu.py`)
+#### Element-wise Operations
 
 **Operations tested**:
 - `ops.mul` - Element-wise multiplication
@@ -50,7 +197,7 @@ xcodebuild -downloadComponent MetalToolchain
 - Metal tools are ~750MB and must be explicitly downloaded
 - Once installed, GPU compilation works perfectly for supported operations
 
-#### Matrix Operations (`linear_layer.py`)
+#### Matrix Operations (see `02_linear_layer/`)
 
 **Operations tested**:
 - `ops.matmul` - Matrix multiplication
@@ -117,22 +264,21 @@ Our DistilBERT implementation uses:
 - GPU support: Via CoreML backend
 - Status: Production-ready for inference
 
-## Running the Examples
-
-### Prerequisites
-1. Apple Silicon Mac (M1 - M5)
-2. Xcode command-line tools installed
-3. MAX installed via pixi
-
-### Commands
+## Benchmarking
 
 ```bash
-# Element-wise operations (will fail on Metal toolchain)
-pixi run python examples/python/elementwise_gpu.py
+# Compare CPU vs GPU for fixed size
+pixi run benchmark-elementwise
 
-# Matrix operations (will fail on missing kernel)
-pixi run python examples/python/linear_layer.py
+# Test scaling behaviour across sizes (4 to 8M elements)
+pixi run benchmark-elementwise-sizes
+
+# Or run directly
+python benchmarks/01_elementwise/benchmark_elementwise.py
+python benchmarks/01_elementwise/benchmark_sizes.py
 ```
+
+See [Apple Silicon GPU Findings](../../../docs/APPLE_SILICON_GPU_FINDINGS.md) for detailed results.
 
 ## Future Work
 

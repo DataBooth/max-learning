@@ -36,7 +36,8 @@ pixi run example-distilbert        # Full transformer sentiment analysis
 pixi run test                      # Full pytest suite (21 tests)
 
 # Run benchmarks
-pixi run benchmark-distilbert      # MAX vs PyTorch comparison
+pixi run benchmark-elementwise     # Element-wise: CPU vs GPU
+pixi run benchmark-distilbert      # DistilBERT: MAX vs PyTorch
 ```
 
 ## Performance Results
@@ -62,7 +63,11 @@ pixi run benchmark-distilbert      # MAX vs PyTorch comparison
 │   ├── 02_linear_layer/           # Linear layer example
 │   └── 03_distilbert_sentiment/   # Full transformer
 ├── tests/python/                  # pytest suite (21 tests)
-├── benchmarks/                    # Performance comparisons
+├── benchmarks/
+│   ├── 01_elementwise/            # CPU vs GPU benchmarks
+│   ├── 03_distilbert/             # MAX vs PyTorch benchmarks
+│   ├── results/                   # Benchmark outputs
+│   └── test_data/                 # Test datasets
 ├── docs/
 │   ├── MAX_FRAMEWORK_GUIDE.md     # Comprehensive MAX guide
 │   ├── PROJECT_STATUS.md          # Current status & learnings
