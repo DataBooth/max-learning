@@ -1,0 +1,23 @@
+# DistilBERT Sentiment Classification Configuration
+# ==================================================
+
+[model]
+# Model directory (relative to repository root)
+model_dir = "models/distilbert-sentiment"
+download_script = "models/download_models.sh"
+
+[test_data]
+# Example texts for sentiment analysis
+texts = [
+    "This movie was absolutely fantastic! I loved every minute of it.",
+    "Terrible experience. Would not recommend.",
+    "It was okay, nothing special.",
+    "Best product I've ever bought!",
+    "Complete waste of money and time.",
+]
+
+[display]
+# Display formatting
+show_confidence = true
+show_scores = true
+confidence_format = ".2%"  # Show as percentage with 2 decimal places
