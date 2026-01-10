@@ -1,0 +1,29 @@
+# Linear Layer Example Configuration
+# ====================================
+# Configuration for the linear layer example.
+# Demonstrates: y = relu(W @ x + b)
+
+[graph]
+# Layer dimensions
+input_features = 4
+output_features = 2
+batch_size = 1
+
+[weights]
+# Weight matrix [output_features, input_features]
+# Maps 4 input features to 2 outputs
+W = [
+    [1.0, 0.5, -0.5, 2.0],   # Output 0 weights
+    [-1.0, 0.5, 1.5, -2.0]   # Output 1 weights
+]
+
+# Bias vector [output_features]
+b = [0.1, -0.1]
+
+[test_data]
+# Test input [batch_size, input_features]
+input_values = [[1.0, 2.0, 3.0, 4.0]]
+
+[device]
+# Default device to use (can be overridden by --device argument)
+default = "cpu"

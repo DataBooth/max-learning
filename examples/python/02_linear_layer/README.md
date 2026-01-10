@@ -1,16 +1,91 @@
-# Minimal MAX Graph Example
+# Linear Layer Example
 
 ## Overview
 
-This is the **simplest possible working example** of the MAX Graph API. It demonstrates the complete workflow from graph construction to inference in under 100 lines of code.
+Demonstrates a simple linear layer (fully connected layer) using MAX Graph. This is the next step up from element-wise operations, showing how to work with matrix operations.
 
-## What It Does
+Note: Mermaid diagrams render on GitHub. For local preview in VS Code, install the "Markdown Preview Mermaid Support" extension.
 
-Implements a single-layer neural network: **y = ReLU(W^T @ x + b)**
+## The Problem
 
-- **Input**: 4 features
-- **Output**: 2 values
-- **Operation**: Matrix multiply → add bias → ReLU activation
+We're computing a linear layer with activation:
+
+```
+y = relu(W @ x + b)
+```
+
+Where:
+- `x` is the input vector [batch_size, input_features]
+- `W` is the weight matrix [output_features, input_features]
+- `b` is the bias vector [output_features]
+- `relu` is the activation function
+
+### Computation Flow
+
+```mermaid
+graph LR
+    A["Input x: [1, 4]"] --> B["ops.transpose: W^T"]
+    B --> C["ops.matmul: x @ W^T"]
+    C --> D["Result: [1, 2]"]
+    D --> E["ops.add: + bias"]
+    E --> F["[1, 2]"]
+    F --> G["ops.relu: max(0, ·)"]
+    G --> H["Output: [1, 2]"]
+```
+
+With default config (4 → 2 linear layer, input=`[[1, 2, 3, 4]]`):
+
+```
+Input:     [[1.0, 2.0, 3.0, 4.0]]  (shape: [1, 4])
+  ↓ matmul with W^T
+Linear:    [[8.5, 0.1]]              (shape: [1, 2])
+  ↓ add bias
+Bias:      [[8.6, 0.0]]              (shape: [1, 2])
+  ↓ relu
+Output:    [[8.6, 0.0]]              (shape: [1, 2])
+```
+
+## Files
+
+- **`linear_layer.py`** - Main example with TOML config support (CPU/GPU)
+- **`linear_layer_config.toml`** - Configuration for weights and test data
+
+## Running the Example
+
+```bash
+# Run on CPU (default from config)
+pixi run example-linear
+
+# Or directly with custom config
+python examples/python/02_linear_layer/linear_layer.py --device cpu
+python examples/python/02_linear_layer/linear_layer.py --device gpu --config my_config.toml
+```
+
+Note: GPU will fail due to missing matmul kernel on Apple Silicon.
+
+## Configuration
+
+Edit `linear_layer_config.toml` to change parameters:
+
+```toml
+[graph]
+input_features = 4
+output_features = 2
+batch_size = 1
+
+[weights]
+W = [[1.0, 0.5, -0.5, 2.0], [-1.0, 0.5, 1.5, -2.0]]
+b = [0.1, -0.1]
+
+[test_data]
+input_values = [[1.0, 2.0, 3.0, 4.0]]
+```
+
+## GPU Status
+
+❌ **Not working on Apple Silicon GPU**: Requires `matmul` kernel which is not yet available.
+
+See [Apple Silicon GPU Findings](../../../docs/APPLE_SILICON_GPU_FINDINGS.md) for details.
 
 ## How It Fits Into MAX Framework
 

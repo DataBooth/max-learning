@@ -28,6 +28,7 @@ example-distilbert = "python examples/python/03_distilbert_sentiment/distilbert_
 # Benchmarking
 benchmark-elementwise = "python benchmarks/01_elementwise/cpu_vs_gpu.py"
 benchmark-elementwise-sizes = "python benchmarks/01_elementwise/cpu_vs_gpu_scaling.py"
+benchmark-linear = "python benchmarks/02_linear_layer/cpu_vs_gpu.py"
 benchmark-distilbert = "python benchmarks/03_distilbert/max_vs_pytorch.py"
 
 # Mojo lexicon classifier
