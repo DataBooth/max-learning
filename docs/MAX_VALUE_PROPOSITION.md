@@ -7,7 +7,7 @@
 **Pain Points:**
 1. **Hardware Lock-in** - Different code for each platform (CUDA/ROCm/Metal)
 2. **Framework Overhead** - PyTorch/TensorFlow designed for training, not optimized inference  
-3. **Performance Ceiling** - Python/framework abstractions limit optimization
+3. **Performance Ceiling** - Python/framework abstractions limit optimisation
 4. **Manual Work** - Hand-tuning kernels expensive and platform-specific
 
 ## MAX's Solution: "Write Once, Run Optimized Everywhere"

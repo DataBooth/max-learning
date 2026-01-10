@@ -1,8 +1,8 @@
-# Examples Reorganization Plan
+# Examples Reorganisation Plan
 
 ## Current Status
 
-Started reorganization but need to complete. Created directory structure:
+Started reorganisation but need to complete. Created directory structure:
 - `examples/python/01_elementwise/` - Created, has new unified example
 - `examples/python/02_linear_layer/` - Created, needs files
 - `examples/python/03_distilbert_sentiment/` - Created, needs files
@@ -68,7 +68,7 @@ example-distilbert = "python examples/python/03_distilbert_sentiment/distilbert_
 ## Quick Commands
 
 ```bash
-# After reorganization complete:
+# After reorganisation complete:
 pixi run example-elementwise-cpu
 pixi run example-elementwise-gpu
 pixi run example-linear
