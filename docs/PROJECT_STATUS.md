@@ -2,76 +2,123 @@
 
 ## Overview
 
-This project implements a high-performance sentiment analysis service using **Modular's MAX Engine** with a custom **DistilBERT** implementation. The implementation has evolved through two major versions:
+A comprehensive learning repository for **Modular's MAX Engine**, featuring progressive examples from simple operations through to production transformer models. Includes the first reported successful MAX Graph inference on Apple Silicon GPU.
 
-- **v0.1.0**: Lexicon-based MVP (completed)
-- **v0.2.0**: Custom MAX Graph DistilBERT (completed)
+**Focus:** Educational resource + performance benchmarking for MAX Graph API
 
-## Current Status: v0.2.0 - Fully Working ✅
+## Version History
+
+- **v0.1.0** (Completed): Lexicon-based sentiment analysis MVP in Mojo
+- **v0.2.0** (Completed): Custom MAX Graph DistilBERT with 5.58x speedup over PyTorch
+- **v0.3.0** (Current): Reorganised for learning + Apple Silicon GPU experiments
+
+## Current Status: v0.3.0 - Ready for Community ✅
 
 ### What We've Built
 
-1. **Custom MAX Graph DistilBERT Implementation**
-   - Complete transformer architecture from scratch
-   - Custom embeddings (no token types)
-   - 6-layer transformer encoder with multi-head attention
-   - Binary sentiment classification head
-   - 100% accuracy parity with HuggingFace PyTorch
+1. **Progressive Learning Examples**
+   - **01_elementwise**: Simple operations (mul, add, relu) with CPU/GPU support
+   - **02_linear_layer**: Linear layer (matmul + bias + relu)
+   - **03_distilbert**: Full transformer sentiment classifier
+   - Each example has config files, comprehensive READMEs, and Mermaid diagrams
 
-2. **Comprehensive Benchmarking Framework**
-   - Config-driven harness (`benchmark.py` + `benchmark_config.toml`)
-   - Support for multiple implementations (custom MAX, HuggingFace, ONNX)
-   - Test data in JSONL format
-   - Multiple output formats: console, JSON, CSV, markdown
-   - System information reporting (hardware, software versions)
+2. **Apple Silicon GPU Breakthrough**
+   - ✅ First reported MAX Graph inference on Apple GPU (M1 Pro)
+   - Element-wise operations working on GPU
+   - Documented matmul kernel limitations
+   - Fixed Xcode 26 Metal Toolchain issue
 
-3. **Performance Results**
-   - **5.58x faster** than HuggingFace PyTorch on Apple M1 CPU
-   - **85% better P95 latency**
-   - **8x more consistent** performance (lower variance)
-   - Identical prediction accuracy (80% on validation set)
+3. **Systematic Benchmarking Framework**
+   - TOML-based configuration (no hardcoded values)
+   - Shared utilities with GPU detection (Apple M1 Pro)
+   - Templated markdown reports with system info
+   - Timestamped outputs in results/ directories
+   - CPU vs GPU comparisons (elementwise, linear layer)
+   - MAX vs PyTorch comparisons (DistilBERT)
 
-4. **Documentation**
-   - MAX Framework Guide (`docs/MAX_FRAMEWORK_GUIDE.md`)
-   - Minimal working example (`examples/minimal_max_example.py`)
+4. **Performance Results**
+   - **DistilBERT**: 5.58x faster than PyTorch on M1 CPU
+   - **Element-wise GPU**: Working but CPU faster (dispatch overhead)
+   - **Linear layer GPU**: Blocked by missing matmul kernel
+
+5. **Complete Documentation**
+   - MAX Framework Guide with best practices
+   - Apple Silicon GPU findings and workarounds
    - Comprehensive inline code documentation
+   - Full pytest suite (21 tests)
 
-### Key Files
+### Repository Structure
 
 ```
 max-learning/
-├── src/python/max_distilbert/  # Custom MAX Graph implementation
-│   ├── __init__.py
-│   ├── embeddings.py           # Custom embeddings (no token types)
-│   ├── transformer.py          # DistilBERT-specific attention & FFN
-│   ├── graph.py               # Graph builder + classification head
-│   ├── inference.py           # High-level inference wrapper
-│   └── model_config.py        # Configuration helpers
-├── benchmark.py               # Benchmarking harness (478 lines)
-├── benchmark_config.toml      # Benchmark configuration
-├── test_data/                 # Test datasets
-│   ├── sentiment_benchmark.jsonl
-│   └── sentiment_validation.jsonl
-├── benchmark_results/         # Generated reports
-│   └── benchmark_20250109_*.md
-├── docs/
-│   ├── MAX_FRAMEWORK_GUIDE.md # Comprehensive MAX documentation
-│   └── PROJECT_STATUS.md      # This file
-└── examples/
-    └── minimal_max_example.py # Simplest MAX Graph example
+├── examples/python/
+│   ├── 01_elementwise/            # Element-wise ops (CPU/GPU)
+│   │   ├── elementwise.py         # --device cpu|gpu support
+│   │   ├── elementwise_config.toml
+│   │   └── README.md              # With Mermaid diagrams
+│   ├── 02_linear_layer/           # Linear layer example
+│   │   ├── linear_layer.py
+│   │   ├── linear_layer_config.toml
+│   │   └── README.md
+│   └── 03_distilbert/             # Full transformer
+│       ├── distilbert_sentiment.py
+│       └── README.md
+├── benchmarks/
+│   ├── benchmark_utils.py         # Shared utilities (GPU detection, reporting)
+│   ├── 01_elementwise/
+│   │   ├── cpu_vs_gpu.py          # Systematic CPU vs GPU benchmark
+│   │   ├── cpu_vs_gpu_scaling.py  # Different tensor sizes
+│   │   ├── benchmark_config.toml  # TOML configuration
+│   │   └── results/               # Timestamped markdown reports
+│   ├── 02_linear_layer/
+│   │   ├── cpu_vs_gpu.py
+│   │   ├── benchmark_config.toml
+│   │   └── results/
+│   └── 03_distilbert/
+│       ├── max_vs_pytorch.py      # MAX vs PyTorch comparison
+│       ├── benchmark.toml
+│       ├── test_data/
+│       └── results/
+├── src/python/max_distilbert/     # Custom DistilBERT implementation
+│   ├── embeddings.py
+│   ├── transformer.py
+│   ├── graph.py
+│   ├── inference.py
+│   └── model_config.py
+├── tests/python/                  # pytest suite (21 tests)
+└── docs/
+    ├── MAX_FRAMEWORK_GUIDE.md     # Comprehensive MAX guide
+    ├── APPLE_SILICON_GPU_FINDINGS.md  # GPU experiments
+    ├── PROJECT_STATUS.md          # This file
+    └── planning/                  # Internal planning docs
 ```
 
-## Outstanding TODOs from v0.1.0
+## Key Achievements
 
-The following TODOs are **no longer relevant** since we moved to v0.2.0:
+### ✅ Apple Silicon GPU Success
+- First reported MAX Graph inference on Apple Silicon GPU
+- Element-wise operations (mul, add, relu) working
+- Documented limitations and workarounds
+- Fixed Xcode 26 Metal Toolchain issue
 
-- ❌ Create src/max_classifier.mojo skeleton
-- ❌ Implement basic BERT tokenization in Mojo
-- ❌ Update classifier.mojo for dual classifier system
-- ❌ Create benchmarking infrastructure (completed in Python instead)
-- ❌ Update documentation (completed differently)
+### ✅ Progressive Learning Path
+- Numbered examples showing MAX Graph progression
+- Each example self-contained with config and README
+- Mermaid diagrams visualising computation flows
+- Clear documentation of GPU support status
 
-These were from the **original Mojo implementation plan** which has been superseded by the **Python MAX Graph approach**.
+### ✅ Systematic Benchmarking
+- Shared utilities for consistent reporting
+- GPU detection in system info (Apple M1 Pro)
+- TOML-based configuration (no hardcoded values)
+- Templated markdown reports
+- Graceful error handling for GPU failures
+
+### ✅ Production-Quality DistilBERT
+- 5.58x speedup over PyTorch on M1 CPU
+- 100% accuracy parity with HuggingFace
+- Comprehensive test suite (21 tests)
+- Full transformer implementation from scratch
 
 ## What We Learned
 
@@ -118,19 +165,17 @@ These were from the **original Mojo implementation plan** which has been superse
 ## Next Possible Directions
 
 ### Short-term
-1. ✅ Enhanced benchmark reporting (completed)
-2. ✅ MAX framework documentation (completed)
-3. ✅ Minimal MAX example (completed)
-4. Add more sentiment test cases
-5. Experiment with quantization (int8, int4)
-6. Multi-batch inference optimisation
+1. Add more examples (convolution, attention mechanisms)
+2. Experiment with quantisation (int8, int4)
+3. Multi-batch inference optimisation
+4. Additional Apple GPU kernel exploration
 
 ### Medium-term
-1. Add other model architectures (BERT, RoBERTa)
+1. Add other model architectures (BERT, RoBERTa, LLaMA)
 2. Explore MAX Pipeline API for LLMs
 3. Deploy with MAX Serve (production serving)
-4. Experiment with Apple GPU (partial support - kernel availability dependent)
-5. Add FastAPI wrapper for REST API
+4. FastAPI wrapper for REST API
+5. Community contributions and feedback integration
 
 ### Long-term
 1. Mojo implementation (once APIs stabilise)
@@ -145,7 +190,3 @@ These were from the **original Mojo implementation plan** which has been superse
 - **Build LLM from Scratch**: https://llm.modular.com
 - **Modular Forums**: https://forum.modular.com
 
-## Version History
-
-- **v0.1.0** (Completed): Lexicon-based sentiment analysis MVP
-- **v0.2.0** (Completed): Custom MAX Graph DistilBERT implementation with comprehensive benchmarking
