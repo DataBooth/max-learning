@@ -74,7 +74,7 @@ fn parse_args() raises -> CliArgs:
 
 fn print_help():
     """Print usage information."""
-    print("max-learning v0.2.0")
+    print("max-learning v0.3.0")
     print("")
     print("USAGE:")
     print("    pixi run inference --text <TEXT> [OPTIONS]")

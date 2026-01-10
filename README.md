@@ -71,18 +71,17 @@ pixi run clean-reports-all         # Remove all reports
 │   ├── 01_elementwise/            # Element-wise ops (CPU/GPU)
 │   ├── 02_linear_layer/           # Linear layer example
 │   └── 03_distilbert_sentiment/   # Full transformer
-├── tests/python/                  # pytest suite (21 tests)
+├── tests/python/                  # pytest suite (30 tests)
 ├── benchmarks/
 │   ├── 01_elementwise/            # CPU vs GPU benchmarks
-│   │   └── results/               # Benchmark outputs
-│   └── 03_distilbert/             # MAX vs PyTorch benchmarks
-│       ├── benchmark.toml         # Configuration
-│       ├── results/               # Benchmark outputs
-│       └── test_data/             # Test datasets
+│   ├── 02_linear_layer/           # Linear layer benchmarks
+│   ├── 03_distilbert/             # MAX vs PyTorch benchmarks
+│   ├── benchmark_utils.py         # Shared benchmark utilities
+│   └── clean_reports.sh           # Cleanup script
+├── config/                        # Global configuration (optional)
 ├── docs/
 │   ├── MAX_FRAMEWORK_GUIDE.md     # Comprehensive MAX guide
 │   ├── PROJECT_STATUS.md          # Current status & learnings
-│   ├── BLOG_DRAFT.md              # Implementation journey
 │   └── APPLE_SILICON_GPU_FINDINGS.md  # GPU experiments
 └── models/                        # Downloaded models (gitignored)
 ```
