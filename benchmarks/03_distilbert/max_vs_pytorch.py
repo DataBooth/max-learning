@@ -10,6 +10,7 @@ import argparse
 import importlib
 import json
 import platform
+import statistics
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -20,6 +21,7 @@ from typing import Any, Callable
 import numpy as np
 import psutil
 import tomli
+from transformers import pipeline
 
 # Add project root to path for imports
 PROJECT_ROOT = Path(__file__).parent.parent.parent

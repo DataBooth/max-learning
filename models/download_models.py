@@ -20,14 +20,30 @@ except ImportError:
 def download_model(
     model_name: str = "distilbert-base-uncased-finetuned-sst-2-english",
     output_dir: str = "distilbert-sentiment",
+    force: bool = False,
 ):
-    """Download a HuggingFace model with safetensors weights."""
+    """Download a HuggingFace model with safetensors weights.
+    
+    Args:
+        model_name: HuggingFace model identifier
+        output_dir: Directory name to save model
+        force: If True, re-download even if model exists
+    """
     
     print(f"🔥 Downloading {model_name} for MAX Graph")
     print("=" * 70)
     
     # Create output directory
     output_path = Path(__file__).parent / output_dir
+    
+    # Check if model already exists
+    if not force and output_path.exists():
+        safetensors_path = output_path / "model.safetensors"
+        if safetensors_path.exists():
+            print(f"\n✅ Model already exists at {output_path}")
+            print("   Use --force to re-download")
+            return
+    
     output_path.mkdir(parents=True, exist_ok=True)
     
     print(f"\n📦 Downloading model from HuggingFace...")
@@ -69,8 +85,11 @@ def download_model(
 
 
 if __name__ == "__main__":
-    # Allow custom model name from command line
-    model_name = sys.argv[1] if len(sys.argv) > 1 else "distilbert-base-uncased-finetuned-sst-2-english"
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else "distilbert-sentiment"
+    # Parse command line arguments
+    force = "--force" in sys.argv
+    args = [arg for arg in sys.argv[1:] if arg != "--force"]
     
-    download_model(model_name, output_dir)
+    model_name = args[0] if len(args) > 0 else "distilbert-base-uncased-finetuned-sst-2-english"
+    output_dir = args[1] if len(args) > 1 else "distilbert-sentiment"
+    
+    download_model(model_name, output_dir, force=force)
