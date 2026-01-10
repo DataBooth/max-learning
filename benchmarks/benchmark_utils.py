@@ -5,6 +5,8 @@ Shared utilities for benchmarks
 Common functions for benchmark configuration, reporting, and error handling.
 """
 
+import csv
+import json
 import platform
 import psutil
 import subprocess
@@ -235,5 +237,78 @@ def save_markdown_report(report: str, output_dir: Path, prefix: str = "benchmark
     
     with open(filepath, 'w') as f:
         f.write(report)
+    
+    return filepath
+
+
+def save_json_report(
+    data: dict,
+    output_dir: Path,
+    prefix: str = "benchmark",
+    indent: int = 2
+) -> Path:
+    """
+    Save benchmark data as JSON with timestamp and machine identifier.
+    
+    Args:
+        data: Dictionary containing benchmark data
+        output_dir: Directory to save in
+        prefix: Filename prefix
+        indent: JSON indentation level
+    
+    Returns:
+        Path to saved file
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    machine_id = get_machine_id()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{prefix}_{machine_id}_{timestamp}.json"
+    filepath = output_dir / filename
+    
+    with open(filepath, 'w') as f:
+        json.dump(data, f, indent=indent)
+    
+    return filepath
+
+
+def save_csv_report(
+    data: dict,
+    output_dir: Path,
+    prefix: str = "benchmark",
+    include_header: bool = True
+) -> Path:
+    """
+    Save benchmark data as CSV with timestamp and machine identifier.
+    
+    Args:
+        data: Dictionary containing benchmark data with 'cpu' and/or 'gpu' keys
+        output_dir: Directory to save in
+        prefix: Filename prefix
+        include_header: Whether to include CSV header
+    
+    Returns:
+        Path to saved file
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    machine_id = get_machine_id()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{prefix}_{machine_id}_{timestamp}.csv"
+    filepath = output_dir / filename
+    
+    # Flatten data for CSV
+    rows = []
+    for device, results in data.items():
+        if results:  # Skip if None/failed
+            row = {'device': device}
+            row.update(results)
+            rows.append(row)
+    
+    if rows:
+        with open(filepath, 'w', newline='') as f:
+            fieldnames = list(rows[0].keys())
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            if include_header:
+                writer.writeheader()
+            writer.writerows(rows)
     
     return filepath

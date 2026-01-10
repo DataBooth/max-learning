@@ -20,7 +20,12 @@ from max.graph import DeviceRef, Graph, TensorType, ops
 
 # Add benchmarks/ to path for benchmark_utils
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from benchmark_utils import generate_markdown_report, save_markdown_report
+from benchmark_utils import (
+    generate_markdown_report,
+    save_markdown_report,
+    save_json_report,
+    save_csv_report
+)
 
 
 def build_elementwise_graph(device_type: str, multiplier: float, offset: float, size: int) -> Graph:
@@ -223,11 +228,14 @@ def main():
             consistency_improvement = (cpu_cv / gpu_cv - 1) * 100
             print(f"  GPU is {consistency_improvement:.1f}% more consistent")
     
-    # Generate markdown report
+    # Generate and save reports
     print(f"\n{'='*60}")
-    print("GENERATING REPORT")
+    print("GENERATING REPORTS")
     print(f"{'='*60}")
     
+    results_dir = script_dir / "results"
+    
+    # Markdown report
     report = generate_markdown_report(
         benchmark_name="Element-wise Operations: CPU vs GPU",
         description="Compares performance of element-wise operations (multiply, add, relu) on CPU vs GPU.",
@@ -236,11 +244,35 @@ def main():
         gpu_results=gpu_results,
         gpu_error=gpu_error
     )
+    md_path = save_markdown_report(report, results_dir, prefix="cpu_vs_gpu")
+    print(f"\n✓ Markdown report: {md_path}")
     
-    results_dir = script_dir / "results"
-    report_path = save_markdown_report(report, results_dir, prefix="cpu_vs_gpu")
+    # JSON report
+    json_data = {
+        "benchmark": config['benchmark'],
+        "config": config,
+        "results": {
+            "cpu": cpu_results,
+            "gpu": gpu_results
+        },
+        "errors": {
+            "cpu": cpu_error,
+            "gpu": gpu_error
+        }
+    }
+    json_path = save_json_report(json_data, results_dir, prefix="cpu_vs_gpu")
+    print(f"✓ JSON report:     {json_path}")
     
-    print(f"\n✓ Report saved: {report_path}")
+    # CSV report
+    csv_data = {}
+    if cpu_results:
+        csv_data['cpu'] = cpu_results
+    if gpu_results:
+        csv_data['gpu'] = gpu_results
+    
+    if csv_data:
+        csv_path = save_csv_report(csv_data, results_dir, prefix="cpu_vs_gpu")
+        print(f"✓ CSV report:      {csv_path}")
 
 
 if __name__ == "__main__":
