@@ -42,22 +42,41 @@ Documentation is excellent, but sometimes you need:
 - 100% accuracy parity
 
 ### 3. Progressive Learning Path
-**Numbered examples build understanding step-by-step:**
+**Six numbered examples build understanding step-by-step:**
 
-**01: Element-wise Operations** - The basics
+Each example includes a **minimal version** (pure MAX Graph API, no abstractions) and a **full version** (with configuration).
+
+**1️⃣ Element-wise Operations** - The basics
 ```bash
-pixi run example-elementwise-cpu   # mul, add, relu
-pixi run example-elementwise-gpu   # Works on Apple Silicon!
+pixi run python examples/python/01_elementwise/elementwise_minimal.py  # Start here!
+pixi run example-elementwise-cpu   # Full version: mul, add, relu
+pixi run example-elementwise-gpu   # Works on Apple Silicon GPU!
 ```
 
-**02: Linear Layer** - Matrix operations
+**2️⃣ Linear Layer** - Matrix operations
 ```bash
-pixi run example-linear            # matmul, bias, activation
+pixi run python examples/python/02_linear_layer/linear_layer_minimal.py  # Learn matmul
+pixi run example-linear            # Full version: matmul, bias, activation
 ```
 
-**03: DistilBERT Sentiment** - Full transformer
+**3️⃣ DistilBERT Sentiment** - Full transformer
 ```bash
-pixi run example-distilbert        # Production-ready model (auto-downloads)
+pixi run example-distilbert        # 66M parameters, 5.58x faster than PyTorch
+```
+
+**4️⃣ MLP Regression** - Multi-layer perceptron
+```bash
+pixi run example-mlp               # Housing price prediction, 3 hidden layers
+```
+
+**5️⃣ CNN MNIST** - Convolutional network
+```bash
+pixi run example-cnn               # Digit classification, 2 conv + 2 dense layers
+```
+
+**6️⃣ RNN Forecast** - Recurrent network (WIP)
+```bash
+# Parked due to MAX Graph API limitations with sequence processing
 ```
 
 ### 4. Systematic Benchmarking
@@ -80,23 +99,31 @@ cd max-learning
 # Install (requires Pixi package manager)
 pixi install
 
-# Run progressive examples (models download automatically)
-pixi run example-elementwise-cpu   # Start here
-pixi run example-linear            # Then this  
-pixi run example-distilbert        # Finally this
+# Start with minimal examples to learn MAX Graph API
+pixi run python examples/python/01_elementwise/elementwise_minimal.py
+pixi run python examples/python/02_linear_layer/linear_layer_minimal.py
+
+# Progress through full examples (models download automatically)
+pixi run example-elementwise-cpu   # 1️⃣
+pixi run example-linear            # 2️⃣  
+pixi run example-distilbert        # 3️⃣
+pixi run example-mlp               # 4️⃣
+pixi run example-cnn               # 5️⃣
 ```
 
 ### Available Pixi Tasks
 
 **Examples** (progressive learning):
 ```bash
-pixi run example-elementwise-cpu   # Simple ops on CPU
-pixi run example-elementwise-gpu   # Simple ops on GPU
-pixi run example-linear            # Linear layer
-pixi run example-distilbert        # Full transformer
+pixi run example-elementwise-cpu   # 1️⃣ Element-wise ops on CPU
+pixi run example-elementwise-gpu   # 1️⃣ Element-wise ops on GPU
+pixi run example-linear            # 2️⃣ Linear layer
+pixi run example-distilbert        # 3️⃣ DistilBERT transformer
+pixi run example-mlp               # 4️⃣ MLP regression
+pixi run example-cnn               # 5️⃣ CNN MNIST classifier
 ```
 
-**Testing** (30 tests, all passing):
+**Testing** (49 tests, all passing):
 ```bash
 pixi run test-python               # Run pytest suite
 pixi run test-all                  # Run all tests
@@ -104,9 +131,11 @@ pixi run test-all                  # Run all tests
 
 **Benchmarking** (generates MD + JSON + CSV):
 ```bash
-pixi run benchmark-elementwise     # CPU vs GPU
-pixi run benchmark-linear          # Linear layer
-pixi run benchmark-distilbert      # MAX vs PyTorch (1000 iterations)
+pixi run benchmark-elementwise     # 1️⃣ CPU vs GPU
+pixi run benchmark-linear          # 2️⃣ Linear layer
+pixi run benchmark-distilbert      # 3️⃣ MAX vs PyTorch
+pixi run benchmark-mlp             # 4️⃣ MAX vs PyTorch
+pixi run benchmark-cnn             # 5️⃣ MAX vs PyTorch
 pixi run benchmark-all             # Run all benchmarks
 ```
 
@@ -124,10 +153,11 @@ Complete documentation in [`README.md`](../README.md)
 ## What You Get
 
 ### Immediate Value
-- **Working examples** - copy, paste, run
+- **Minimal examples** - pure MAX Graph API without abstractions
+- **Working implementations** - 6 progressive examples, copy, paste, run
 - **Benchmarking framework** - adapt for your experiments
 - **GPU workarounds** - specifically for Apple Silicon
-- **Test suite** - 30 tests showing validation approaches
+- **Test suite** - 49 tests showing validation approaches with correctness checks
 - **Configuration patterns** - production-ready structure
 
 ### Learning Resources
@@ -141,18 +171,23 @@ Complete documentation in [`README.md`](../README.md)
 ```
 max-learning/
 ├── examples/python/
-│   ├── 01_elementwise/      # Simple ops, CPU/GPU support, config-driven
-│   ├── 02_linear_layer/     # Matrix ops, config-driven
-│   └── 03_distilbert_sentiment/  # Full transformer wrapper
+│   ├── 01_elementwise/          # Element-wise ops (minimal + full)
+│   ├── 02_linear_layer/         # Linear layer (minimal + full)
+│   ├── 03_distilbert_sentiment/ # DistilBERT transformer
+│   ├── 03_mlp_regression/       # MLP for housing prices
+│   ├── 04_cnn_mnist/            # CNN digit classifier
+│   └── 05_rnn_forecast/         # RNN (WIP)
 ├── benchmarks/
-│   ├── benchmark_utils.py   # Shared utilities (GPU detection, reporting)
-│   ├── clean_reports.sh     # Cleanup script
-│   ├── 01_elementwise/      # CPU vs GPU benchmarks + config
-│   ├── 02_linear_layer/     # Linear benchmarks + config
-│   └── 03_distilbert/       # MAX vs PyTorch + config
-├── tests/python/            # 30 tests mirroring examples structure
-├── docs/                    # Comprehensive guides
-└── src/python/max_distilbert/   # Custom DistilBERT implementation
+│   ├── 01_elementwise/          # CPU vs GPU
+│   ├── 02_linear_layer/         # CPU vs GPU
+│   ├── 03_distilbert/           # MAX vs PyTorch
+│   ├── 03_mlp/                  # MAX vs PyTorch
+│   └── 04_cnn/                  # MAX vs PyTorch
+├── tests/python/                # 49 tests mirroring examples
+├── docs/                        # Comprehensive guides
+└── src/python/
+    ├── max_*/                   # MAX implementations
+    └── utils/                   # Shared utilities (paths, benchmarks)
 ```
 
 ## Who Is This For?
@@ -168,7 +203,7 @@ max-learning/
 ### This Might Not Be For You If:
 - Looking for MAX Pipeline API examples (we focus on Graph API)
 - Training models (this is inference-only)
-- Need many model architectures (currently: 1 transformer, 2 simple ops)
+- Need many model architectures (currently: 1 transformer, 1 MLP, 1 CNN, 2 basic ops)
 - Want production-scale deployment patterns (this is learning-focused)
 
 ## Technical Details
@@ -182,16 +217,18 @@ max-learning/
 
 ### What Currently Works
 - Element-wise operations on Apple Silicon GPU
-- All operations on CPU (both simple and transformer)
+- All operations on CPU (element-wise, linear, transformers, MLP, CNN)
 - DistilBERT transformer on CPU (5.58x faster than PyTorch)
 - Configuration-driven benchmarks with multiple output formats
-- Comprehensive test coverage (30 tests)
+- Comprehensive test coverage (49 tests with correctness validation)
+- Package-based structure (no sys.path manipulation)
 
 ### Known Limitations
-- **GPU-constrained**: No matmul kernel for Apple Silicon GPU (blocks transformers)
+- **GPU-constrained**: No matmul kernel for Apple Silicon GPU (blocks transformers, MLP, CNN)
 - **No ETA**: Waiting on Modular team for advanced GPU kernels
 - **macOS focused**: Tested on Apple Silicon (patterns are portable)
-- **Limited scope**: Single transformer architecture
+- **Performance**: PyTorch faster on some workloads (MLP, CNN) - MAX shines on transformers
+- **RNN**: Parked due to MAX Graph API limitations with sequence processing
 
 ## How This Compares to Official MAX Examples
 
@@ -227,7 +264,7 @@ It bridges the gap between reading API docs and building production models, with
 
 ## Contributing & Feedback
 
-**This is v0.3.0 - ready for community feedback!** All 30 tests passing, benchmarks working across all examples.
+**This is v0.3.0 - ready for community feedback!** All 49 tests passing, benchmarks working across all examples, minimal examples highlighting MAX Graph API.
 
 **We welcome:**
 - Bug reports - What broke? How can we fix it?
