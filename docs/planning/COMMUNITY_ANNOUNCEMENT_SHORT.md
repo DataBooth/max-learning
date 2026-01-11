@@ -13,7 +13,7 @@ A hands-on learning repository for Modular's MAX Engine, featuring six progressi
 - Complete benchmarking framework with MAX vs PyTorch comparisons
 - MLP regression and CNN MNIST implementations
 
-**Perfect for:** Engineers wanting to learn MAX Graph API through working code, building from basics to transformers.
+**Perfect for:** Anyone wanting to learn MAX Graph API through working code, building from basics to transformers.
 
 **Ready for community feedback!** All tests passing, all examples working.
 

@@ -13,7 +13,7 @@ This repository fills that gap by providing:
 5. **Production insights** - What works, what doesn't, and why (including Apple Silicon GPU findings)
 6. **Testing patterns** - Comprehensive pytest suite showing how to validate MAX implementations
 
-**Who is this for?** Engineers and researchers wanting to understand MAX Graph API through hands-on examples.
+**Who is this for?** Anyone wanting to understand MAX Graph API through hands-on examples.
 
 ## Status
 
@@ -35,7 +35,7 @@ Each example includes both a **minimal version** (no abstractions, pure MAX Grap
 **Path**: `examples/python/02_linear_layer/`  
 **Operation**: `y = relu(x @ W^T + b)`  
 **Learn**: Matrix operations (matmul, transpose), parameter handling  
-**Status**: ✅ Works on CPU, ❌ GPU (matmul kernel missing)
+**Status**: ✅ Works on CPU, ❌ Apple Silicon GPU (matmul kernel missing)
 
 ### 3️⃣ DistilBERT Sentiment
 **Path**: `examples/python/03_distilbert_sentiment/`  
