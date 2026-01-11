@@ -293,10 +293,64 @@ def main():
     else:
         print("\nSkipping PyTorch benchmark (disabled in config)")
     
-    # Compare results
+    # Verify correctness
     if max_results and pytorch_results:
         print(f"\n{'='*70}")
-        print("COMPARISON")
+        print("CORRECTNESS VERIFICATION")
+        print(f"{'='*70}")
+        
+        # Run both implementations on same small test input
+        test_input = test_data[:5]  # First 5 samples
+        
+        # MAX prediction
+        max_model = MLPRegressionModel(
+            input_size=config['model']['input_size'],
+            hidden_size1=config['model']['hidden_size1'],
+            hidden_size2=config['model']['hidden_size2'],
+            output_size=config['model']['output_size'],
+            weights=weights,
+            device=config['implementations']['device'],
+        )
+        max_pred = max_model.predict(test_input)
+        
+        # PyTorch prediction
+        pytorch_model = PyTorchMLP(
+            input_size=config['model']['input_size'],
+            hidden_size1=config['model']['hidden_size1'],
+            hidden_size2=config['model']['hidden_size2'],
+            output_size=config['model']['output_size'],
+        )
+        with torch.no_grad():
+            pytorch_model.fc1.weight.data = torch.from_numpy(weights['W1'])
+            pytorch_model.fc1.bias.data = torch.from_numpy(weights['b1'])
+            pytorch_model.fc2.weight.data = torch.from_numpy(weights['W2'])
+            pytorch_model.fc2.bias.data = torch.from_numpy(weights['b2'])
+            pytorch_model.fc3.weight.data = torch.from_numpy(weights['W3'])
+            pytorch_model.fc3.bias.data = torch.from_numpy(weights['b3'])
+        pytorch_model.eval()
+        
+        with torch.no_grad():
+            pytorch_pred = pytorch_model(torch.from_numpy(test_input)).numpy()
+        
+        # Compare
+        max_error = np.abs(max_pred - pytorch_pred).max()
+        relative_error = max_error / (np.abs(pytorch_pred).mean() + 1e-8)
+        
+        print(f"\nMax absolute error: {max_error:.6f}")
+        print(f"Relative error: {relative_error:.6f}")
+        
+        if np.allclose(max_pred, pytorch_pred, rtol=1e-4, atol=1e-5):
+            print("✓ Outputs match within tolerance (rtol=1e-4, atol=1e-5)")
+        else:
+            print("✗ WARNING: Outputs differ significantly!")
+            print(f"\nSample predictions (first 3):")
+            for i in range(min(3, len(test_input))):
+                print(f"  Sample {i+1}: PyTorch={pytorch_pred[i,0]:.6f}, MAX={max_pred[i,0]:.6f}")
+    
+    # Compare performance
+    if max_results and pytorch_results:
+        print(f"\n{'='*70}")
+        print("PERFORMANCE COMPARISON")
         print(f"{'='*70}")
         
         speedup = pytorch_results["mean_ms"] / max_results["mean_ms"]
