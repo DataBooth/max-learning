@@ -117,7 +117,12 @@ class CNNClassifier(Module):
         x = ops.max_pool2d(x, kernel_size=(2, 2), stride=(2, 2))
         # After pool: [batch, 7, 7, 64]
         
-        # Flatten: [batch, 7, 7, 64] → [batch, 3136]
+        # Transpose NHWC to NCHW before flatten (to match PyTorch flatten order)
+        # [batch, 7, 7, 64] → [batch, 64, 7, 7]
+        x = ops.transpose(x, 3, 1)  # [B, H, W, C] → [B, C, W, H]
+        x = ops.transpose(x, 2, 3)  # [B, C, W, H] → [B, C, H, W]
+        
+        # Flatten: [batch, 64, 7, 7] → [batch, 3136] (channel-first order)
         x = ops.flatten(x, start_dim=1)
         
         # FC block 1: Linear → ReLU
