@@ -18,6 +18,7 @@ onnxscript = ">=0.5.6,<0.6"
 numpy = ">=2.4.0,<3"
 pytest = ">=9.0.2,<10"
 tqdm = ">=4.67.1,<5"
+scikit-learn = ">=1.6.1,<2"
 
 [tasks]
 # Setup
@@ -27,6 +28,7 @@ download-models = "bash models/download_models.sh"
 example-elementwise-cpu = "python examples/python/01_elementwise/elementwise.py --device cpu"
 example-elementwise-gpu = "python examples/python/01_elementwise/elementwise.py --device gpu"
 example-linear = "python examples/python/02_linear_layer/linear_layer.py"
+example-mlp = "python examples/python/03_mlp_regression/mlp_regression.py"
 example-distilbert = { depends-on = ["download-models"], cmd = "python examples/python/03_distilbert_sentiment/distilbert_sentiment.py" }
 
 # Benchmarking

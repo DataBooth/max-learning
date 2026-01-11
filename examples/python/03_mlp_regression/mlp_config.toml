@@ -1,0 +1,11 @@
+# MLP Regression Configuration
+
+[model]
+# Architecture: Input → Hidden1 → Hidden2 → Output
+input_size = 8      # California housing: 8 features
+hidden_size1 = 128  # First hidden layer
+hidden_size2 = 64   # Second hidden layer
+output_size = 1     # Regression: single continuous value
+
+[device]
+default = "cpu"     # Device for inference
