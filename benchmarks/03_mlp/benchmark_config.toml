@@ -23,7 +23,7 @@ input_size = 8
 hidden_size1 = 128
 hidden_size2 = 64
 output_size = 1
-batch_size = 32
+batch_size = 2048  # Large enough to show throughput patterns
 
 [implementations]
 # Which implementations to benchmark
