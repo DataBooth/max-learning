@@ -15,12 +15,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# Add project root to path dynamically
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-from src.python.utils.paths import add_project_root_to_path
-add_project_root_to_path()
-
-from src.python.max_cnn import CNNClassificationModel
+# Import from installed package
+from max_cnn import CNNClassificationModel
 
 
 class PyTorchCNN(nn.Module):

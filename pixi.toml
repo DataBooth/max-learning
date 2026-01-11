@@ -21,6 +21,9 @@ pytest = ">=9.0.2,<10"
 tqdm = ">=4.67.1,<5"
 scikit-learn = ">=1.6.1,<2"
 
+[pypi-dependencies]
+max-learning-python = { path = "src/python", editable = true }
+
 [tasks]
 # Setup
 download-models = "bash models/download_models.sh"

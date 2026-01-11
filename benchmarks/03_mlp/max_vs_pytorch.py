@@ -18,20 +18,17 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
-# Add project root to path dynamically
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from src.python.utils.paths import add_project_root_to_path
-add_project_root_to_path()
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from benchmark_utils import (
+# Import from installed packages
+from utils.benchmark_utils import (
     generate_markdown_report,
     save_markdown_report,
     save_json_report,
     save_csv_report
 )
 
-from src.python.max_mlp import MLPRegressionModel
+# Import from installed packages (no sys.path needed!)
+from utils.paths import get_examples_dir
+from max_mlp import MLPRegressionModel
 
 
 class PyTorchMLP(nn.Module):
@@ -246,7 +243,6 @@ def main():
     print(f"Warmup: {config['benchmark']['warmup_iterations']}")
     
     # Load pre-trained weights
-    from src.python.utils.paths import get_examples_dir
     weights_path = get_examples_dir() / "03_mlp_regression" / "weights" / "mlp_weights.npz"
     
     if not weights_path.exists():

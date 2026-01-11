@@ -24,12 +24,8 @@ from pathlib import Path
 
 import numpy as np
 
-# Add project root to path dynamically
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-from src.python.utils.paths import add_project_root_to_path
-add_project_root_to_path()
-
-from src.python.max_mlp import MLPRegressionModel
+# Import from installed package
+from max_mlp import MLPRegressionModel
 
 
 def load_california_housing_sample(n_samples=10):

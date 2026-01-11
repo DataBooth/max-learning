@@ -5,10 +5,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-# Add project root to path dynamically
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-from src.python.utils.paths import get_project_root, get_examples_dir, add_project_root_to_path
-add_project_root_to_path()
+# Import utils from installed package
+from utils.paths import get_examples_dir
 
 # Import the example module
 example_path = get_examples_dir() / "01_elementwise"

@@ -17,13 +17,8 @@ import sys
 import tomllib
 from pathlib import Path
 
-# Add project root to path dynamically
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-from src.python.utils.paths import get_project_root, get_models_dir, add_project_root_to_path
-add_project_root_to_path()
-
-# Add src/python to path for max_distilbert import
-sys.path.insert(0, str(get_project_root() / "src" / "python"))
+# Import from installed packages
+from utils.paths import get_models_dir
 from max_distilbert import DistilBertSentimentClassifier
 
 

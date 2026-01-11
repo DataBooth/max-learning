@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: max-learning-python
+Version: 0.3.0
+Summary: MAX Graph Python utilities and models
+Requires-Python: >=3.11
