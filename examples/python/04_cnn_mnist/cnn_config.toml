@@ -1,0 +1,11 @@
+# CNN MNIST Configuration
+
+[model]
+# MNIST image specifications
+input_channels = 1      # Grayscale images
+image_height = 28       # MNIST standard size
+image_width = 28        # MNIST standard size
+num_classes = 10        # Digits 0-9
+
+[device]
+default = "cpu"         # Device for inference (cpu or gpu)

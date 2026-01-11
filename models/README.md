@@ -1,6 +1,22 @@
 # Models Directory
 
-This directory contains pre-trained transformer models for sentiment analysis, loaded via MAX Graph API.
+This directory contains **large pre-trained models** downloaded from HuggingFace or other external sources.
+
+## Design Philosophy
+
+**models/** vs **examples/.../weights/**:
+- `models/` = Large, complex, pre-trained models (transformers, foundation models)
+- `examples/.../weights/` = Small, simple, locally-trained weights (MLP, CNN, RNN)
+
+This separation keeps:
+- Simple examples self-contained and reproducible
+- Large models centralized and cached
+- Clear distinction between "training from scratch" examples and "pre-trained model inference" examples
+
+For example:
+- MLP (example 03): Trains small network on California housing → stores weights locally
+- CNN (example 04): Trains small CNN on MNIST → stores weights locally  
+- DistilBERT (example 06): Uses pre-trained 66M parameter model → downloads to models/
 
 ## Current Models
 

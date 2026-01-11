@@ -12,6 +12,7 @@ env = { MOJO_PATH = "$PIXI_PROJECT_ROOT/src:$HOME/code/github/databooth/mojo-tom
 modular = "*"
 transformers = ">=4.57.3,<5"
 pytorch = ">=2.9.1,<3"
+torchvision = ">=0.22.1,<1"
 optimum = ">=2.1.0,<3"
 onnxruntime = ">=1.22.2,<2"
 onnxscript = ">=0.5.6,<0.6"
@@ -29,6 +30,7 @@ example-elementwise-cpu = "python examples/python/01_elementwise/elementwise.py 
 example-elementwise-gpu = "python examples/python/01_elementwise/elementwise.py --device gpu"
 example-linear = "python examples/python/02_linear_layer/linear_layer.py"
 example-mlp = "python examples/python/03_mlp_regression/mlp_regression.py"
+example-cnn = "python examples/python/04_cnn_mnist/cnn_mnist.py"
 example-distilbert = { depends-on = ["download-models"], cmd = "python examples/python/03_distilbert_sentiment/distilbert_sentiment.py" }
 
 # Benchmarking
