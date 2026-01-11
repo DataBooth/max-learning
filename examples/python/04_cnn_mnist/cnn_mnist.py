@@ -26,10 +26,10 @@ from pathlib import Path
 
 import numpy as np
 
-# Add project root to path
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+# Add project root to path dynamically
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from src.python.utils.paths import add_project_root_to_path
+add_project_root_to_path()
 
 from src.python.max_cnn import CNNClassificationModel
 

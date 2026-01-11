@@ -17,9 +17,13 @@ import sys
 import tomllib
 from pathlib import Path
 
-# Add src/python to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src" / "python"))
+# Add project root to path dynamically
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from src.python.utils.paths import get_project_root, get_models_dir, add_project_root_to_path
+add_project_root_to_path()
 
+# Add src/python to path for max_distilbert import
+sys.path.insert(0, str(get_project_root() / "src" / "python"))
 from max_distilbert import DistilBertSentimentClassifier
 
 
@@ -32,8 +36,7 @@ def main():
         config = tomllib.load(f)
     
     # Model path (relative to repo root)
-    repo_root = Path(__file__).parent.parent.parent.parent
-    model_path = repo_root / config["model"]["model_dir"]
+    model_path = get_models_dir() / Path(config["model"]["model_dir"]).name
     
     if not model_path.exists():
         print(f"Error: Model directory not found: {model_path}")

@@ -4,16 +4,20 @@ from pathlib import Path
 
 import pytest
 
-# Add src/python to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src" / "python"))
+# Add project root to path dynamically
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from src.python.utils.paths import get_project_root, get_models_dir, add_project_root_to_path
+add_project_root_to_path()
 
+# Add src/python to path for max_distilbert import
+sys.path.insert(0, str(get_project_root() / "src" / "python"))
 from max_distilbert import DistilBertSentimentClassifier
 
 
 @pytest.fixture(scope="module")
 def model_path():
     """Get path to the DistilBERT model."""
-    path = Path(__file__).parent.parent.parent.parent / "models" / "distilbert-sentiment"
+    path = get_models_dir() / "distilbert-sentiment"
     if not path.exists():
         pytest.skip(f"Model not found at {path}. Run: models/download_models.sh")
     return path

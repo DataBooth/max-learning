@@ -5,8 +5,13 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+# Add project root to path dynamically
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from src.python.utils.paths import get_project_root, get_examples_dir, add_project_root_to_path
+add_project_root_to_path()
+
 # Import the example module
-example_path = Path(__file__).parent.parent.parent.parent / "examples" / "python" / "02_linear_layer"
+example_path = get_examples_dir() / "02_linear_layer"
 sys.path.insert(0, str(example_path))
 
 # Import directly to test the functions
