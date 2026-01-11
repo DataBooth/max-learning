@@ -57,3 +57,4 @@ htmlcov/
 
 # Benchmark results - timestamped outputs
 benchmarks/*/results/
+*.tar.gz
