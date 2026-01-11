@@ -15,7 +15,6 @@ from max.graph.weights import load_weights
 from transformers import AutoConfig, AutoTokenizer
 
 from .graph import build_graph
-from .model_config import DistilBertConfig
 
 
 @dataclass
