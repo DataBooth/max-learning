@@ -146,8 +146,16 @@ class DistilBertSentimentClassifier:
 
 def main():
     """Demo the classifier."""
+    # Add project root to path
+    import sys
+    PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+    if str(PROJECT_ROOT) not in sys.path:
+        sys.path.insert(0, str(PROJECT_ROOT))
+    
+    from src.python.utils.paths import get_models_dir
+    
     # Model path
-    model_path = Path(__file__).parent.parent.parent / "models" / "distilbert-sentiment"
+    model_path = get_models_dir() / "distilbert-sentiment"
     
     if not model_path.exists():
         print(f"Error: Model directory not found: {model_path}")

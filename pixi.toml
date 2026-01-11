@@ -21,6 +21,9 @@ pytest = ">=9.0.2,<10"
 tqdm = ">=4.67.1,<5"
 scikit-learn = ">=1.6.1,<2"
 
+[pypi-dependencies]
+max-learning-python = { path = "src/python", editable = true }
+
 [tasks]
 # Setup
 download-models = "bash models/download_models.sh"
@@ -37,8 +40,10 @@ example-distilbert = { depends-on = ["download-models"], cmd = "python examples/
 benchmark-elementwise = "python benchmarks/01_elementwise/cpu_vs_gpu.py"
 benchmark-elementwise-sizes = "python benchmarks/01_elementwise/cpu_vs_gpu_scaling.py"
 benchmark-linear = "python benchmarks/02_linear_layer/cpu_vs_gpu.py"
+benchmark-mlp = "python benchmarks/03_mlp/max_vs_pytorch.py"
+benchmark-cnn = "python benchmarks/04_cnn/max_vs_pytorch.py"
 benchmark-distilbert = { depends-on = ["download-models"], cmd = "python benchmarks/03_distilbert/max_vs_pytorch.py" }
-benchmark-all = { depends-on = ["benchmark-elementwise", "benchmark-linear", "benchmark-distilbert"] }
+benchmark-all = { depends-on = ["benchmark-elementwise", "benchmark-linear", "benchmark-mlp", "benchmark-cnn", "benchmark-distilbert"] }
 
 # Mojo lexicon classifier
 mojo-build = "mojo build -I $HOME/code/github/databooth/mojo-toml/src -I $HOME/code/github/databooth/mojo-dotenv/src src/mojo/lexicon_classifier/main.mojo -o lexicon-classifier"

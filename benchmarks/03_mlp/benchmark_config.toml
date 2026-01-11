@@ -1,0 +1,32 @@
+# MLP Regression Benchmark Configuration
+# ========================================
+
+[benchmark]
+name = "MLP Regression: MAX vs PyTorch"
+description = "Compares MAX Graph and PyTorch performance for 3-layer MLP regression"
+
+# Benchmark parameters
+warmup_iterations = 50
+test_iterations = 500
+save_results = true
+results_dir = "results"
+
+[output]
+# Reporting precision (significant figures)
+latency_sigfigs = 3      # e.g., 0.0325 ms, 1.23 ms
+throughput_sigfigs = 3   # e.g., 30700 req/s, 965 req/s
+ratio_sigfigs = 3        # e.g., 1.45x speedup, CV 0.341
+
+[model]
+# MLP architecture
+input_size = 8
+hidden_size1 = 128
+hidden_size2 = 64
+output_size = 1
+batch_size = 2048  # Large enough to show throughput patterns
+
+[implementations]
+# Which implementations to benchmark
+max_enabled = true
+pytorch_enabled = true
+device = "cpu"  # MAX CPU vs PyTorch CPU

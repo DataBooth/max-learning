@@ -47,10 +47,70 @@ Output:    [[8.6, 0.0]]              (shape: [1, 2])
 
 ## Files
 
-- **`linear_layer.py`** - Main example with TOML config support (CPU/GPU)
+- **`linear_layer_minimal.py`** - ⭐ **Start here!** Self-contained minimal example (~140 lines)
+- **`linear_layer.py`** - Full-featured example with TOML config support (CPU/GPU)
 - **`linear_layer_config.toml`** - Configuration for weights and test data
 
-## Running the Example
+### Which File to Use?
+
+Both files are **functionally equivalent** - they perform the same linear layer computation (`y = relu(x @ W^T + b)`) and produce identical results. The difference is how the code is structured:
+
+**Learning MAX Graph?** → Start with `linear_layer_minimal.py`
+- **No abstractions** - all code inline, no helper functions
+- **Graph construction highlighted** - clear 4-step flow:
+  1. BUILD GRAPH
+  2. COMPILE GRAPH
+  3. RUN INFERENCE
+  4. DISPLAY RESULTS
+- ~140 lines focusing purely on MAX Graph API
+- Shows matrix operations (matmul, transpose) explicitly
+- Best for understanding core graph operations
+
+**Experimenting with parameters?** → Use `linear_layer.py`
+- TOML configuration for easy parameter changes
+- CPU/GPU device switching via command-line
+- Modular structure with helper functions
+
+## Running the Examples
+
+### Minimal Example (Recommended for Learning)
+
+```bash
+# Run the minimal, self-contained example
+python examples/python/02_linear_layer/linear_layer_minimal.py
+```
+
+**Output**:
+```
+Building MAX Graph...
+Linear layer: 4 → 2
+
+✓ Graph built
+
+Compiling graph...
+✓ Graph compiled
+
+Running inference...
+✓ Inference complete
+
+============================================================
+RESULTS
+============================================================
+Operation: y = relu(x @ W^T + b)
+
+Input shape:  (1, 4)
+Weight shape: (2, 4)
+Bias shape:   (2,)
+
+Input:  [[1. 2. 3. 4.]]
+Output: [[8.6 0. ]]
+
+Expected (NumPy): [[8.6 0. ]]
+Match: True
+============================================================
+```
+
+### Full Example (With Configuration)
 
 ```bash
 # Run on CPU (default from config)

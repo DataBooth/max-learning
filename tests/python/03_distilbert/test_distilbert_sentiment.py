@@ -4,16 +4,15 @@ from pathlib import Path
 
 import pytest
 
-# Add src/python to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src" / "python"))
-
+# Import from installed packages
+from utils.paths import get_models_dir
 from max_distilbert import DistilBertSentimentClassifier
 
 
 @pytest.fixture(scope="module")
 def model_path():
     """Get path to the DistilBERT model."""
-    path = Path(__file__).parent.parent.parent.parent / "models" / "distilbert-sentiment"
+    path = get_models_dir() / "distilbert-sentiment"
     if not path.exists():
         pytest.skip(f"Model not found at {path}. Run: models/download_models.sh")
     return path

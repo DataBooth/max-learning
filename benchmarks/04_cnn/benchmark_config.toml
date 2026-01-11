@@ -1,0 +1,32 @@
+# CNN MNIST Benchmark Configuration
+# ===================================
+
+[benchmark]
+name = "CNN MNIST: MAX vs PyTorch"
+description = "Compares MAX Graph and PyTorch performance for CNN image classification"
+
+# Benchmark parameters
+warmup_iterations = 50
+test_iterations = 500
+save_results = true
+results_dir = "results"
+
+[output]
+# Reporting precision (significant figures)
+latency_sigfigs = 3      # e.g., 0.0325 ms, 1.23 ms
+throughput_sigfigs = 3   # e.g., 30700 req/s, 965 req/s
+ratio_sigfigs = 3        # e.g., 1.45x speedup, CV 0.341
+
+[model]
+# CNN architecture: Conv(1→32)→Pool→Conv(32→64)→Pool→Flatten→FC(128)→FC(10)
+input_channels = 1
+image_height = 28
+image_width = 28
+num_classes = 10
+batch_size = 256  # Reasonable batch for CNN inference
+
+[implementations]
+# Which implementations to benchmark
+max_enabled = true
+pytorch_enabled = true
+device = "cpu"  # MAX CPU vs PyTorch CPU

@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "max-learning-python"
+version = "0.3.0"
+description = "MAX Graph Python utilities and models"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["max_*", "utils"]

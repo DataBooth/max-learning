@@ -5,8 +5,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+# Import utils from installed package
+from utils.paths import get_examples_dir
+
 # Import the example module
-example_path = Path(__file__).parent.parent.parent.parent / "examples" / "python" / "02_linear_layer"
+example_path = get_examples_dir() / "02_linear_layer"
 sys.path.insert(0, str(example_path))
 
 # Import directly to test the functions

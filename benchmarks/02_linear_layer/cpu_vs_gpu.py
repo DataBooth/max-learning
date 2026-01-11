@@ -21,9 +21,8 @@ from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
 
-# Add benchmarks/ to path for benchmark_utils
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from benchmark_utils import (
+# Import from installed package
+from utils.benchmark_utils import (
     generate_markdown_report,
     save_markdown_report,
     save_json_report,

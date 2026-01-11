@@ -26,12 +26,8 @@ from pathlib import Path
 
 import numpy as np
 
-# Add project root to path
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-from src.python.max_cnn import CNNClassificationModel
+# Import from installed package
+from max_cnn import CNNClassificationModel
 
 
 def load_mnist_samples():
