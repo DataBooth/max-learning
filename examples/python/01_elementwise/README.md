@@ -124,10 +124,63 @@ Output:    [3,   0,   7,   0]
 
 ## Files
 
-- **`elementwise.py`** - Main example with TOML config support (CPU/GPU)
+- **`elementwise_minimal.py`** - ⭐ **Start here!** Self-contained minimal example (~120 lines)
+- **`elementwise.py`** - Full-featured example with TOML config support (CPU/GPU)
 - **`elementwise_config.toml`** - Configuration for multiplier, offset, and test data
 
-## Running the Example
+### Which File to Use?
+
+Both files are **functionally equivalent** - they perform the same computation (`y = relu(x * 2.0 + 1.0)`) and produce identical results. The difference is how the code is structured:
+
+**Learning MAX Graph?** → Start with `elementwise_minimal.py`
+- **No abstractions** - all code inline, no helper functions
+- **Graph construction highlighted** - clear 4-step flow:
+  1. BUILD GRAPH
+  2. COMPILE GRAPH
+  3. RUN INFERENCE
+  4. DISPLAY RESULTS
+- ~120 lines focusing purely on MAX Graph API
+- Best for understanding the core graph operations
+
+**Experimenting with parameters?** → Use `elementwise.py`
+- TOML configuration for easy parameter changes
+- CPU/GPU device switching via command-line
+- Modular structure with helper functions
+
+## Running the Examples
+
+### Minimal Example (Recommended for Learning)
+
+```bash
+# Run the minimal, self-contained example
+python examples/python/01_elementwise/elementwise_minimal.py
+```
+
+**Output**:
+```
+Building MAX Graph...
+✓ Graph built
+
+Compiling graph...
+✓ Graph compiled
+
+Running inference...
+✓ Inference complete
+
+============================================================
+RESULTS
+============================================================
+Operation: y = relu(x * 2.0 + 1.0)
+
+Input:  [ 1. -2.  3. -4.]
+Output: [3. 0. 7. 0.]
+
+Expected (NumPy): [3. 0. 7. 0.]
+Match: True
+============================================================
+```
+
+### Full Example (With Configuration)
 
 ```bash
 # Run on CPU (default from config)
