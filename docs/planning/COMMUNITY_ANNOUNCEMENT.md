@@ -2,7 +2,7 @@
 
 ## What Is This?
 
-An **introductory learning repository** for Modular's MAX Engine, documenting a systematic journey from simple operations through to production transformer models. This captures real learning experiences, working code, and actual performance results to help others get started with MAX Graph API.
+An **introductory learning repository** for Modular's MAX Engine, documenting a systematic journey from simple operations through to transformer models. This captures real learning experiences, working code, and actual performance results to help others get started with MAX Graph API.
 
 **Repository:** https://github.com/DataBooth/max-learning  
 **Version:** 0.3.0
@@ -11,7 +11,7 @@ An **introductory learning repository** for Modular's MAX Engine, documenting a 
 
 ### The Learning Journey
 MAX is powerful, but getting started can be challenging. This repository shares:
-- **Real learning progression** - from confusion to clarity
+- **Real learning progression** - from simple operations to transformers
 - **Working examples** - not theoretical, actually runs
 - **Actual benchmarks** - real hardware, real numbers
 - **Mistakes and solutions** - what didn't work and why
