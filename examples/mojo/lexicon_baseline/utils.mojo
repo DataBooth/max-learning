@@ -9,10 +9,10 @@ from math import exp
 fn sigmoid(x: Float64) -> Float64:
     """
     Sigmoid activation function.
-    
+
     Args:
         x: Input value.
-    
+
     Returns:
         Sigmoid(x) in range (0, 1).
     """
@@ -22,10 +22,10 @@ fn sigmoid(x: Float64) -> Float64:
 fn normalize_text(text: String) -> String:
     """
     Normalize input text.
-    
+
     Args:
         text: Input text.
-    
+
     Returns:
         Normalized text (lowercased, trimmed).
     """
@@ -39,11 +39,11 @@ fn normalize_text(text: String) -> String:
 fn truncate_text(text: String, max_length: Int) -> String:
     """
     Truncate text to maximum length.
-    
+
     Args:
         text: Input text.
         max_length: Maximum character length.
-    
+
     Returns:
         Truncated text.
     """

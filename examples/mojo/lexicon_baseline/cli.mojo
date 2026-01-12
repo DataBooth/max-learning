@@ -12,7 +12,7 @@ struct CliArgs:
     var text: String
     var config_path: String
     var help_requested: Bool
-    
+
     fn __init__(out self, text: String, config_path: String = "config.toml", help_requested: Bool = False):
         self.text = text
         self.config_path = config_path
@@ -22,13 +22,13 @@ struct CliArgs:
 fn parse_args() raises -> CliArgs:
     """
     Parse command-line arguments.
-    
+
     Returns:
         CliArgs with parsed arguments.
-    
+
     Raises:
         Error if required arguments are missing or invalid.
-    
+
     Usage:
         pixi run inference --text "Sample text"
         pixi run inference --text "Sample text" --config custom.toml
@@ -38,17 +38,17 @@ fn parse_args() raises -> CliArgs:
     var text = String("")
     var config_path = String("config.toml")
     var help_requested = False
-    
+
     # Skip program name (args[0])
     var i = 1
     while i < len(args):
         var arg = args[i]
-        
+
         # Skip -- separator (used by pixi)
         if arg == "--":
             i += 1
             continue
-        
+
         if arg == "--help" or arg == "-h":
             help_requested = True
             i += 1
@@ -64,11 +64,11 @@ fn parse_args() raises -> CliArgs:
             i += 2
         else:
             raise Error("Unknown argument: " + arg)
-    
+
     # Validate required arguments
     if not help_requested and len(text) == 0:
         raise Error("Required argument --text is missing")
-    
+
     return CliArgs(text, config_path, help_requested)
 
 
