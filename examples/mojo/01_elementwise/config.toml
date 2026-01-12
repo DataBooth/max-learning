@@ -1,0 +1,32 @@
+# Configuration for Elementwise Operations Example
+# This demonstrates the pattern for using mojo-toml for configuration
+# Will be used by Mojo MAX Graph examples once the API is accessible
+
+[graph]
+name = "elementwise_minimal"
+description = "Demonstrates MAX Graph basics with element-wise operations"
+
+[graph.operation]
+description = "y = relu(x * multiplier + offset)"
+multiplier = 2.0
+offset = 1.0
+
+[graph.input]
+size = 4
+dtype = "float32"
+# Test input data
+values = [1.0, -2.0, 3.0, -4.0]
+
+[graph.expected_output]
+# Expected output: relu([1.0*2.0+1.0, -2.0*2.0+1.0, 3.0*2.0+1.0, -4.0*2.0+1.0])
+# = relu([3.0, -3.0, 7.0, -7.0]) = [3.0, 0.0, 7.0, 0.0]
+values = [3.0, 0.0, 7.0, 0.0]
+
+[execution]
+device = "cpu"  # Options: "cpu", "gpu"
+verbose = true
+
+[display]
+show_graph_structure = false
+show_timing = true
+precision = 4  # Decimal places for output

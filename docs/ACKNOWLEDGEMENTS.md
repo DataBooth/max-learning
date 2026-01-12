@@ -19,7 +19,8 @@ The MLP implementation using `max.nn.Module` was inspired by the official MAX do
 
 ### MAX Graph API Fundamentals
 General MAX Graph concepts learned from:
-- [Getting started with MAX graphs](https://docs.modular.com/max/graph/)
+- [Get started with MAX graphs (Python tutorial)](https://docs.modular.com/max/develop/get-started-with-max-graph-in-python)
+- [Introduction to MAX Graph](https://docs.modular.com/max/graph/)
 - [MAX Graph Operations Reference](https://docs.modular.com/max/graph/ops)
 - [Device Management](https://docs.modular.com/max/graph/devices)
 
