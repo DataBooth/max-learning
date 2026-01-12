@@ -121,6 +121,7 @@ pixi run clean-reports-all         # Remove all benchmark reports
 │   ├── max_*/                     # MAX implementations (distilbert, mlp, cnn, rnn)
 │   ├── utils/                     # Shared utilities (paths, benchmarks)
 │   └── pyproject.toml             # Package configuration
+├── src/mojo/                          # (Empty - ready for MAX Graph Mojo modules)
 ├── examples/mojo/
 │   └── lexicon_baseline/          # v0.1.0 pure Mojo baseline (non-MAX Graph)
 ├── examples/python/
