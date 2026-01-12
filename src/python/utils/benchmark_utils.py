@@ -9,11 +9,11 @@ import csv
 import json
 import math
 import platform
-import psutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional
+
+import psutil
 
 
 def get_gpu_info() -> str:
@@ -21,15 +21,12 @@ def get_gpu_info() -> str:
     try:
         if platform.system() == "Darwin":  # macOS
             result = subprocess.run(
-                ["system_profiler", "SPDisplaysDataType"],
-                capture_output=True,
-                text=True,
-                timeout=5
+                ["system_profiler", "SPDisplaysDataType"], capture_output=True, text=True, timeout=5
             )
             # Extract chipset info
-            for line in result.stdout.split('\n'):
-                if 'Chipset Model:' in line or 'Chip Model:' in line:
-                    return line.split(':', 1)[1].strip()
+            for line in result.stdout.split("\n"):
+                if "Chipset Model:" in line or "Chip Model:" in line:
+                    return line.split(":", 1)[1].strip()
         return "Unknown"
     except Exception:
         return "Unknown"
@@ -37,17 +34,17 @@ def get_gpu_info() -> str:
 
 def get_machine_id() -> str:
     """Get a short machine identifier for filenames.
-    
+
     Returns a sanitised string like 'm1-pro', 'm2-max', etc.
     """
     gpu = get_gpu_info().lower()
-    
+
     # Extract chip identifier from GPU info
-    if 'apple' in gpu:
+    if "apple" in gpu:
         # e.g. "Apple M1 Pro" -> "m1-pro"
-        parts = gpu.replace('apple', '').strip().split()
-        return '-'.join(parts).replace(' ', '-')
-    elif 'unknown' in gpu or not gpu:
+        parts = gpu.replace("apple", "").strip().split()
+        return "-".join(parts).replace(" ", "-")
+    elif "unknown" in gpu or not gpu:
         # Fallback to machine architecture
         machine = platform.machine().lower()
         return machine
@@ -58,21 +55,21 @@ def get_machine_id() -> str:
 
 def format_sigfigs(value: float, sigfigs: int) -> str:
     """Format a number to specified significant figures.
-    
+
     Args:
         value: Number to format
         sigfigs: Number of significant figures
-    
+
     Returns:
         Formatted string with appropriate precision
     """
     if value == 0:
         return "0"
-    
+
     # Calculate magnitude
     magnitude = math.floor(math.log10(abs(value)))
     decimals = sigfigs - magnitude - 1
-    
+
     # Format with appropriate decimal places
     if decimals < 0:
         # Large numbers: round to appropriate place
@@ -82,7 +79,7 @@ def format_sigfigs(value: float, sigfigs: int) -> str:
         return f"{value:.{decimals}f}"
 
 
-def get_system_info() -> Dict[str, str]:
+def get_system_info() -> dict[str, str]:
     """Collect system information for benchmark reports."""
     return {
         "os": f"{platform.system()} {platform.release()}",
@@ -98,7 +95,7 @@ def get_system_info() -> Dict[str, str]:
 
 REPORT_TEMPLATE = """# {benchmark_name}
 
-**Date**: {timestamp}  
+**Date**: {timestamp}
 **Description**: {description}
 
 ## System Information
@@ -129,13 +126,13 @@ def generate_markdown_report(
     benchmark_name: str,
     description: str,
     config: dict,
-    cpu_results: Optional[dict],
-    gpu_results: Optional[dict],
-    gpu_error: Optional[str] = None
+    cpu_results: dict | None,
+    gpu_results: dict | None,
+    gpu_error: str | None = None,
 ) -> str:
     """
     Generate a markdown report for benchmark results using template.
-    
+
     Args:
         benchmark_name: Name of the benchmark
         description: Brief description
@@ -143,7 +140,7 @@ def generate_markdown_report(
         cpu_results: CPU benchmark results (or None if failed)
         gpu_results: GPU benchmark results (or None if failed)
         gpu_error: GPU error message if applicable
-    
+
     Returns:
         Markdown formatted report string
     """
@@ -151,7 +148,7 @@ def generate_markdown_report(
     sys_info = get_system_info()
     system_info_lines = [f"- **{k.replace('_', ' ').title()}**: {v}" for k, v in sys_info.items()]
     system_info_str = "\n".join(system_info_lines)
-    
+
     # Config as TOML
     config_lines = []
     for section, values in config.items():
@@ -161,16 +158,16 @@ def generate_markdown_report(
                 if isinstance(v, str):
                     config_lines.append(f'{k} = "{v}"')
                 elif isinstance(v, bool):
-                    config_lines.append(f'{k} = {str(v).lower()}')
+                    config_lines.append(f"{k} = {str(v).lower()}")
                 else:
-                    config_lines.append(f'{k} = {v}')
+                    config_lines.append(f"{k} = {v}")
             config_lines.append("")
     config_toml_str = "\n".join(config_lines)
-    
+
     # Get precision settings from config
-    lat_sf = config.get('output', {}).get('latency_sigfigs', 3)
-    thr_sf = config.get('output', {}).get('throughput_sigfigs', 3)
-    
+    lat_sf = config.get("output", {}).get("latency_sigfigs", 3)
+    thr_sf = config.get("output", {}).get("throughput_sigfigs", 3)
+
     # CPU results
     if cpu_results:
         cpu_lines = [
@@ -187,7 +184,7 @@ def generate_markdown_report(
         cpu_results_str = "\n".join(cpu_lines)
     else:
         cpu_results_str = "❌ CPU benchmark failed"
-    
+
     # GPU results
     if gpu_results:
         gpu_lines = [
@@ -208,16 +205,16 @@ def generate_markdown_report(
             gpu_lines.append("")
             gpu_lines.append(f"**Error**: {gpu_error}")
         gpu_results_str = "\n".join(gpu_lines)
-    
+
     # Comparison
     comparison_str = ""
     if cpu_results and gpu_results:
-        ratio_sf = config.get('output', {}).get('ratio_sigfigs', 3)
-        
+        ratio_sf = config.get("output", {}).get("ratio_sigfigs", 3)
+
         speedup = cpu_results["mean_ms"] / gpu_results["mean_ms"]
         cpu_cv = cpu_results["std_ms"] / cpu_results["mean_ms"]
         gpu_cv = gpu_results["std_ms"] / gpu_results["mean_ms"]
-        
+
         comp_lines = [
             "## Comparison",
             "",
@@ -227,38 +224,38 @@ def generate_markdown_report(
             f"- **CPU Consistency (CV)**: {format_sigfigs(cpu_cv, ratio_sf)}",
             f"- **GPU Consistency (CV)**: {format_sigfigs(gpu_cv, ratio_sf)}",
         ]
-        
+
         if cpu_cv < gpu_cv:
             improvement = (gpu_cv / cpu_cv - 1) * 100
             comp_lines.append(f"- CPU is {improvement:.1f}% more consistent")
         else:
             improvement = (cpu_cv / gpu_cv - 1) * 100
             comp_lines.append(f"- GPU is {improvement:.1f}% more consistent")
-        
+
         comparison_str = "\n".join(comp_lines)
-    
+
     # Fill template
     return REPORT_TEMPLATE.format(
         benchmark_name=benchmark_name,
-        timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         description=description,
         system_info=system_info_str,
         config_toml=config_toml_str,
         cpu_results=cpu_results_str,
         gpu_results=gpu_results_str,
-        comparison=comparison_str
+        comparison=comparison_str,
     )
 
 
 def save_markdown_report(report: str, output_dir: Path, prefix: str = "benchmark") -> Path:
     """
     Save markdown report with timestamp and machine identifier.
-    
+
     Args:
         report: Markdown content
         output_dir: Directory to save in
         prefix: Filename prefix
-    
+
     Returns:
         Path to saved file
     """
@@ -267,28 +264,25 @@ def save_markdown_report(report: str, output_dir: Path, prefix: str = "benchmark
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{prefix}_{machine_id}_{timestamp}.md"
     filepath = output_dir / filename
-    
-    with open(filepath, 'w') as f:
+
+    with open(filepath, "w") as f:
         f.write(report)
-    
+
     return filepath
 
 
 def save_json_report(
-    data: dict,
-    output_dir: Path,
-    prefix: str = "benchmark",
-    indent: int = 2
+    data: dict, output_dir: Path, prefix: str = "benchmark", indent: int = 2
 ) -> Path:
     """
     Save benchmark data as JSON with timestamp and machine identifier.
-    
+
     Args:
         data: Dictionary containing benchmark data
         output_dir: Directory to save in
         prefix: Filename prefix
         indent: JSON indentation level
-    
+
     Returns:
         Path to saved file
     """
@@ -297,28 +291,25 @@ def save_json_report(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{prefix}_{machine_id}_{timestamp}.json"
     filepath = output_dir / filename
-    
-    with open(filepath, 'w') as f:
+
+    with open(filepath, "w") as f:
         json.dump(data, f, indent=indent)
-    
+
     return filepath
 
 
 def save_csv_report(
-    data: dict,
-    output_dir: Path,
-    prefix: str = "benchmark",
-    include_header: bool = True
+    data: dict, output_dir: Path, prefix: str = "benchmark", include_header: bool = True
 ) -> Path:
     """
     Save benchmark data as CSV with timestamp and machine identifier.
-    
+
     Args:
         data: Dictionary containing benchmark data with 'cpu' and/or 'gpu' keys
         output_dir: Directory to save in
         prefix: Filename prefix
         include_header: Whether to include CSV header
-    
+
     Returns:
         Path to saved file
     """
@@ -327,21 +318,21 @@ def save_csv_report(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{prefix}_{machine_id}_{timestamp}.csv"
     filepath = output_dir / filename
-    
+
     # Flatten data for CSV
     rows = []
     for device, results in data.items():
         if results:  # Skip if None/failed
-            row = {'device': device}
+            row = {"device": device}
             row.update(results)
             rows.append(row)
-    
+
     if rows:
-        with open(filepath, 'w', newline='') as f:
+        with open(filepath, "w", newline="") as f:
             fieldnames = list(rows[0].keys())
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             if include_header:
                 writer.writeheader()
             writer.writerows(rows)
-    
+
     return filepath

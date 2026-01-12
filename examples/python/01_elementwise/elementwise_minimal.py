@@ -42,25 +42,21 @@ input_spec = TensorType(DType.float32, shape=[INPUT_SIZE], device=device)
 with Graph("elementwise_minimal", input_types=[input_spec]) as graph:
     # Get input tensor from graph
     x = graph.inputs[0].tensor
-    
+
     # Create constants for multiply and add
     multiplier_const = ops.constant(
-        np.full(INPUT_SIZE, MULTIPLIER, dtype=np.float32),
-        dtype=DType.float32,
-        device=device
+        np.full(INPUT_SIZE, MULTIPLIER, dtype=np.float32), dtype=DType.float32, device=device
     )
-    
+
     offset_const = ops.constant(
-        np.full(INPUT_SIZE, OFFSET, dtype=np.float32),
-        dtype=DType.float32,
-        device=device
+        np.full(INPUT_SIZE, OFFSET, dtype=np.float32), dtype=DType.float32, device=device
     )
-    
+
     # Build computation: y = relu(x * multiplier + offset)
     y = ops.mul(x, multiplier_const)  # x * 2.0
-    y = ops.add(y, offset_const)       # + 1.0
-    y = ops.relu(y)                    # relu(...)
-    
+    y = ops.add(y, offset_const)  # + 1.0
+    y = ops.relu(y)  # relu(...)
+
     # Mark output
     graph.output(y)
 

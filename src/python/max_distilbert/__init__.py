@@ -2,4 +2,4 @@
 
 from .inference import DistilBertSentimentClassifier
 
-__all__ = ['DistilBertSentimentClassifier']
+__all__ = ["DistilBertSentimentClassifier"]

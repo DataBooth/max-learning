@@ -21,6 +21,7 @@ pytest = ">=9.0.2,<10"
 tqdm = ">=4.67.1,<5"
 scikit-learn = ">=1.6.1,<2"
 pre-commit = ">=4.5.1,<5"
+ruff = ">=0.8.6,<1"
 
 [pypi-dependencies]
 max-learning-python = { path = "src/python", editable = true }
@@ -63,6 +64,9 @@ mojo-check = "mojo check src/mojo/ tests/mojo/"
 # Code quality tasks
 pre-commit = "pre-commit run --all-files"
 pre-commit-install = "pre-commit install"
+ruff-check = "ruff check ."
+ruff-fix = "ruff check . --fix"
+ruff-format = "ruff format ."
 
 # Cleanup
 clean-reports-md = "bash benchmarks/clean_reports.sh md"

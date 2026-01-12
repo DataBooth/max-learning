@@ -33,6 +33,9 @@ ignore = [
     "E501",   # Line too long (handled by formatter)
     "B008",   # Do not perform function calls in argument defaults
     "B905",   # zip without explicit strict parameter
+    "N803",   # Argument name should be lowercase (allow X, W, etc. for math)
+    "N806",   # Variable in function should be lowercase (allow X, W, etc. for math)
+    "N812",   # Lowercase imported as non-lowercase (allow F for functional)
 ]
 
 [format]

@@ -10,71 +10,72 @@ Run:
   pixi run benchmark-linear
 """
 
-import sys
 import time
-import tomllib
-import numpy as np
 from pathlib import Path
-from tqdm import tqdm
-from max.driver import Accelerator, CPU, Tensor
+
+import numpy as np
+import tomllib
+from max.driver import CPU, Accelerator, Tensor
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
+from tqdm import tqdm
 
 # Import from installed package
 from utils.benchmark_utils import (
     generate_markdown_report,
-    save_markdown_report,
+    save_csv_report,
     save_json_report,
-    save_csv_report
+    save_markdown_report,
 )
 
 
-def build_linear_layer_graph(device_type: str, batch_size: int, 
-                             input_features: int, output_features: int) -> Graph:
+def build_linear_layer_graph(
+    device_type: str, batch_size: int, input_features: int, output_features: int
+) -> Graph:
     """Build graph: y = relu(W @ x + b)"""
     device = DeviceRef(device_type)
     input_spec = TensorType(DType.float32, shape=[batch_size, input_features], device=device)
-    
+
     with Graph(f"linear_layer_{device_type}", input_types=[input_spec]) as graph:
         x = graph.inputs[0].tensor
-        
+
         # Random weights
         W = ops.constant(
             np.random.randn(output_features, input_features).astype(np.float32),
             dtype=DType.float32,
-            device=x.device
+            device=x.device,
         )
-        
+
         b = ops.constant(
             np.random.randn(output_features).astype(np.float32),
             dtype=DType.float32,
-            device=x.device
+            device=x.device,
         )
-        
+
         # Computation
         y = ops.matmul(x, ops.transpose(W, 0, 1))
         y = ops.add(y, b)
         y = ops.relu(y)
-        
+
         graph.output(y)
-    
+
     return graph
 
 
 def benchmark_device(device_type: str, config: dict):
     """Benchmark linear layer on specified device."""
-    
-    print(f"\n{'='*60}")
+
+    print(f"\n{'=' * 60}")
     print(f"Benchmarking {device_type.upper()}")
-    print(f"{'='*60}")
-    
-    iterations = config['benchmark']['test_iterations']
-    warmup = config['benchmark']['warmup_iterations']
-    batch_size = config['graph']['batch_size']
-    input_features = config['graph']['input_features']
-    output_features = config['graph']['output_features']
-    
+    print(f"{'=' * 60}")
+
+    iterations = config["benchmark"]["test_iterations"]
+    warmup = config["benchmark"]["warmup_iterations"]
+    batch_size = config["graph"]["batch_size"]
+    input_features = config["graph"]["input_features"]
+    output_features = config["graph"]["output_features"]
+
     # Initialize device
     try:
         if device_type == "gpu":
@@ -86,25 +87,25 @@ def benchmark_device(device_type: str, config: dict):
         error_msg = f"Failed to initialize {device_type}: {str(e)}"
         print(f"✗ {error_msg}")
         return None, error_msg
-    
+
     # Build and compile graph
     try:
         graph = build_linear_layer_graph(device_type, batch_size, input_features, output_features)
         session = InferenceSession(devices=[device])
         model = session.load(graph)
-        print(f"✓ Graph compiled")
+        print("✓ Graph compiled")
     except Exception as e:
         error_msg = f"Failed to compile graph: {str(e)}"
         print(f"✗ {error_msg}")
         if device_type == "gpu" and "matmul" in str(e).lower():
             error_msg += " (matmul kernel not available on Apple Silicon GPU)"
-            print(f"  Note: matmul kernel not available on Apple Silicon GPU")
+            print("  Note: matmul kernel not available on Apple Silicon GPU")
         return None, error_msg
-    
+
     # Prepare input
     input_data_np = np.random.randn(batch_size, input_features).astype(np.float32)
     input_data = Tensor.from_numpy(input_data_np).to(device)
-    
+
     # Warmup
     print(f"\nWarming up ({warmup} iterations)...")
     try:
@@ -114,11 +115,11 @@ def benchmark_device(device_type: str, config: dict):
         error_msg = f"Execution failed during warmup: {str(e)}"
         print(f"✗ {error_msg}")
         return None, error_msg
-    
+
     # Benchmark
     print(f"\nRunning benchmark ({iterations} iterations)...")
     times = []
-    
+
     try:
         for _ in tqdm(range(iterations), desc="Benchmark", unit="iter", ncols=80, mininterval=0.5):
             start = time.perf_counter()
@@ -129,7 +130,7 @@ def benchmark_device(device_type: str, config: dict):
         error_msg = f"Execution failed during benchmark: {str(e)}"
         print(f"✗ {error_msg}")
         return None, error_msg
-    
+
     # Calculate statistics
     times = np.array(times)
     mean_time = np.mean(times)
@@ -138,7 +139,7 @@ def benchmark_device(device_type: str, config: dict):
     p99_time = np.percentile(times, 99)
     std_time = np.std(times)
     throughput = 1000 / mean_time
-    
+
     results = {
         "device": device_type,
         "mean_ms": mean_time,
@@ -147,93 +148,93 @@ def benchmark_device(device_type: str, config: dict):
         "p99_ms": p99_time,
         "std_ms": std_time,
         "throughput": throughput,
-        "iterations": iterations
+        "iterations": iterations,
     }
-    
-    print(f"\nResults:")
+
+    print("\nResults:")
     print(f"  Mean:       {mean_time:.4f} ms")
     print(f"  Median:     {median_time:.4f} ms")
     print(f"  P95:        {p95_time:.4f} ms")
     print(f"  P99:        {p99_time:.4f} ms")
     print(f"  Std Dev:    {std_time:.4f} ms")
     print(f"  Throughput: {throughput:.2f} req/sec")
-    
+
     return results, None
 
 
 def main():
-    print("="*60)
+    print("=" * 60)
     print("Linear Layer: CPU vs GPU Benchmark")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Load configuration
     script_dir = Path(__file__).parent
     config_path = script_dir / "benchmark_config.toml"
-    
-    with open(config_path, 'rb') as f:
+
+    with open(config_path, "rb") as f:
         config = tomllib.load(f)
-    
+
     print(f"\nLoaded config from: {config_path}")
     print(f"Iterations: {config['benchmark']['test_iterations']}")
     print(f"Warmup: {config['benchmark']['warmup_iterations']}")
     print(f"Layer: {config['graph']['input_features']} → {config['graph']['output_features']}")
     print(f"Batch size: {config['graph']['batch_size']}")
-    
+
     # Benchmark CPU
     cpu_results = None
     cpu_error = None
-    if config['devices']['cpu_enabled']:
+    if config["devices"]["cpu_enabled"]:
         result, error = benchmark_device("cpu", config)
         cpu_results = result
         cpu_error = error
     else:
         print("\nSkipping CPU benchmark (disabled in config)")
-    
+
     # Benchmark GPU
     gpu_results = None
     gpu_error = None
-    if config['devices']['gpu_enabled']:
+    if config["devices"]["gpu_enabled"]:
         result, error = benchmark_device("gpu", config)
         gpu_results = result
         gpu_error = error
     else:
         print("\nSkipping GPU benchmark (disabled in config)")
-    
+
     # Compare results (console output)
     if cpu_results and gpu_results:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("COMPARISON")
-        print(f"{'='*60}")
-        
+        print(f"{'=' * 60}")
+
         speedup = cpu_results["mean_ms"] / gpu_results["mean_ms"]
         throughput_ratio = gpu_results["throughput"] / cpu_results["throughput"]
-        
+
         print(f"\nCPU:  {cpu_results['mean_ms']:.4f} ms mean")
         print(f"GPU:  {gpu_results['mean_ms']:.4f} ms mean")
         print(f"\nSpeedup: {speedup:.2f}x")
         print(f"GPU is {speedup:.2f}x {'faster' if speedup > 1 else 'slower'} than CPU")
         print(f"Throughput improvement: {throughput_ratio:.2f}x")
-        
+
         # Latency consistency
         cpu_cv = cpu_results["std_ms"] / cpu_results["mean_ms"]
         gpu_cv = gpu_results["std_ms"] / gpu_results["mean_ms"]
-        print(f"\nConsistency (lower is better):")
+        print("\nConsistency (lower is better):")
         print(f"  CPU CV: {cpu_cv:.4f}")
         print(f"  GPU CV: {gpu_cv:.4f}")
     elif cpu_results:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("SUMMARY")
-        print(f"{'='*60}")
-        print(f"\nCPU benchmark completed successfully")
-        print(f"GPU benchmark failed (expected - matmul kernel not available)")
-    
+        print(f"{'=' * 60}")
+        print("\nCPU benchmark completed successfully")
+        print("GPU benchmark failed (expected - matmul kernel not available)")
+
     # Generate and save reports
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("GENERATING REPORTS")
-    print(f"{'='*60}")
-    
+    print(f"{'=' * 60}")
+
     results_dir = script_dir / "results"
-    
+
     # Markdown report
     report = generate_markdown_report(
         benchmark_name="Linear Layer: CPU vs GPU",
@@ -241,34 +242,28 @@ def main():
         config=config,
         cpu_results=cpu_results,
         gpu_results=gpu_results,
-        gpu_error=gpu_error
+        gpu_error=gpu_error,
     )
     md_path = save_markdown_report(report, results_dir, prefix="cpu_vs_gpu")
     print(f"\n✓ Markdown report: {md_path}")
-    
+
     # JSON report
     json_data = {
-        "benchmark": config['benchmark'],
+        "benchmark": config["benchmark"],
         "config": config,
-        "results": {
-            "cpu": cpu_results,
-            "gpu": gpu_results
-        },
-        "errors": {
-            "cpu": cpu_error,
-            "gpu": gpu_error
-        }
+        "results": {"cpu": cpu_results, "gpu": gpu_results},
+        "errors": {"cpu": cpu_error, "gpu": gpu_error},
     }
     json_path = save_json_report(json_data, results_dir, prefix="cpu_vs_gpu")
     print(f"✓ JSON report:     {json_path}")
-    
+
     # CSV report
     csv_data = {}
     if cpu_results:
-        csv_data['cpu'] = cpu_results
+        csv_data["cpu"] = cpu_results
     if gpu_results:
-        csv_data['gpu'] = gpu_results
-    
+        csv_data["gpu"] = gpu_results
+
     if csv_data:
         csv_path = save_csv_report(csv_data, results_dir, prefix="cpu_vs_gpu")
         print(f"✓ CSV report:      {csv_path}")

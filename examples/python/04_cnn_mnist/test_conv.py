@@ -3,7 +3,6 @@
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from max.driver import CPU, Tensor
 from max.dtype import DType
 from max.engine import InferenceSession
@@ -11,20 +10,16 @@ from max.graph import DeviceRef, Graph, TensorType, ops
 
 # Simple test: 1x1x3x3 input, 1->1 conv, 3x3 kernel
 print("Testing conv2d operation...")
-print("="*60)
+print("=" * 60)
 
 # Create simple input: 1 batch, 1 channel, 3x3 image
-input_nchw = np.array([[[[1, 2, 3],
-                          [4, 5, 6],
-                          [7, 8, 9]]]], dtype=np.float32)
+input_nchw = np.array([[[[1, 2, 3], [4, 5, 6], [7, 8, 9]]]], dtype=np.float32)
 
 print(f"Input (NCHW): shape={input_nchw.shape}")
 print(input_nchw[0, 0])
 
 # Create 3x3 kernel (identity-ish)
-kernel_oihw = np.array([[[[1, 0, 0],
-                           [0, 1, 0],
-                           [0, 0, 1]]]], dtype=np.float32)
+kernel_oihw = np.array([[[[1, 0, 0], [0, 1, 0], [0, 0, 1]]]], dtype=np.float32)
 
 bias = np.array([0.0], dtype=np.float32)
 
@@ -62,10 +57,10 @@ input_type = TensorType(DType.float32, shape=[1, 3, 3, 1], device=device_ref)
 
 with Graph("test_conv", input_types=[input_type]) as graph:
     x = graph.inputs[0].tensor
-    
+
     kernel_const = ops.constant(kernel_rscf, dtype=DType.float32, device=device_ref)
     bias_const = ops.constant(bias, dtype=DType.float32, device=device_ref)
-    
+
     y = ops.conv2d(x, kernel_const, bias=bias_const, stride=(1, 1), padding=(1, 1, 1, 1))
     graph.output(y)
 
@@ -87,4 +82,6 @@ print(f"Output:\n{output_max_nchw[0, 0]}")
 print("\n--- Comparison ---")
 diff = np.abs(output_torch[0, 0].numpy() - output_max_nchw[0, 0])
 print(f"Max difference: {diff.max():.6f}")
-print(f"Match: {'YES ✓' if np.allclose(output_torch[0, 0].numpy(), output_max_nchw[0, 0], atol=1e-5) else 'NO ✗'}")
+print(
+    f"Match: {'YES ✓' if np.allclose(output_torch[0, 0].numpy(), output_max_nchw[0, 0], atol=1e-5) else 'NO ✗'}"
+)

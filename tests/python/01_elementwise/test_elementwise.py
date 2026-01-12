@@ -1,9 +1,8 @@
 """Tests for elementwise operations example."""
+
 import sys
-from pathlib import Path
 
 import numpy as np
-import pytest
 
 # Import utils from installed package
 from utils.paths import get_examples_dir
@@ -13,7 +12,6 @@ example_path = get_examples_dir() / "01_elementwise"
 sys.path.insert(0, str(example_path))
 
 from elementwise import build_elementwise_graph
-
 from max.driver import CPU, Tensor
 from max.engine import InferenceSession
 
@@ -46,15 +44,15 @@ class TestElementwiseOperations:
         device = CPU()
         session = InferenceSession(devices=[device])
         model = session.load(graph)
-        
+
         # Create test input
         input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
         input_data = Tensor.from_numpy(input_data_np).to(device)
-        
+
         # Run inference
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
-        
+
         assert output_np is not None
         assert output_np.shape == (4,)
 
@@ -64,18 +62,18 @@ class TestElementwiseOperations:
         device = CPU()
         session = InferenceSession(devices=[device])
         model = session.load(graph)
-        
+
         # Create test input
         input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
         input_data = Tensor.from_numpy(input_data_np).to(device)
-        
+
         # Run inference
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
-        
+
         # Verify with NumPy calculation: relu(x * multiplier + offset)
         expected = np.maximum(0, input_data_np * self.multiplier + self.offset)
-        
+
         assert np.allclose(output_np, expected, rtol=1e-5, atol=1e-5)
 
     def test_relu_activation(self):
@@ -84,14 +82,14 @@ class TestElementwiseOperations:
         device = CPU()
         session = InferenceSession(devices=[device])
         model = session.load(graph)
-        
+
         # Input that should produce negative pre-activation values
         input_data_np = np.array([-5.0, -5.0, -5.0, -5.0], dtype=np.float32)
         input_data = Tensor.from_numpy(input_data_np).to(device)
-        
+
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
-        
+
         # All outputs should be >= 0 due to ReLU
         assert np.all(output_np >= 0)
 
@@ -99,18 +97,18 @@ class TestElementwiseOperations:
         """Test with different tensor sizes."""
         test_sizes = [1, 4, 16, 64]
         device = CPU()
-        
+
         for size in test_sizes:
             graph = build_elementwise_graph("cpu", self.multiplier, self.offset, size)
             session = InferenceSession(devices=[device])
             model = session.load(graph)
-            
+
             input_data_np = np.random.randn(size).astype(np.float32)
             input_data = Tensor.from_numpy(input_data_np).to(device)
-            
+
             output = model.execute(input_data)[0]
             output_np = output.to_numpy()
-            
+
             expected = np.maximum(0, input_data_np * self.multiplier + self.offset)
             assert np.allclose(output_np, expected, rtol=1e-5, atol=1e-5)
 
@@ -118,22 +116,22 @@ class TestElementwiseOperations:
         """Test with different multiplier and offset values."""
         device = CPU()
         test_params = [
-            (1.0, 0.0),   # Identity-like
-            (0.5, 2.0),   # Different scale
+            (1.0, 0.0),  # Identity-like
+            (0.5, 2.0),  # Different scale
             (3.0, -1.0),  # Negative offset
         ]
-        
+
         for mult, off in test_params:
             graph = build_elementwise_graph("cpu", mult, off, self.size)
             session = InferenceSession(devices=[device])
             model = session.load(graph)
-            
+
             input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
             input_data = Tensor.from_numpy(input_data_np).to(device)
-            
+
             output = model.execute(input_data)[0]
             output_np = output.to_numpy()
-            
+
             expected = np.maximum(0, input_data_np * mult + off)
             assert np.allclose(output_np, expected, rtol=1e-5, atol=1e-5)
 
@@ -143,13 +141,13 @@ class TestElementwiseOperations:
         device = CPU()
         session = InferenceSession(devices=[device])
         model = session.load(graph)
-        
+
         input_data_np = np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32)
         input_data = Tensor.from_numpy(input_data_np).to(device)
-        
+
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
-        
+
         # With positive inputs, ReLU shouldn't change the values
         expected = input_data_np * self.multiplier + self.offset
         assert np.allclose(output_np, expected, rtol=1e-5, atol=1e-5)
@@ -160,13 +158,13 @@ class TestElementwiseOperations:
         device = CPU()
         session = InferenceSession(devices=[device])
         model = session.load(graph)
-        
+
         input_data_np = np.zeros(self.size, dtype=np.float32)
         input_data = Tensor.from_numpy(input_data_np).to(device)
-        
+
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
-        
+
         # 0 * mult + offset, then relu
         expected = np.maximum(0, self.offset)
         assert np.allclose(output_np, np.full(self.size, expected), rtol=1e-5, atol=1e-5)

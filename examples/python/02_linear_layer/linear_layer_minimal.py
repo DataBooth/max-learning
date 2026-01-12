@@ -29,10 +29,13 @@ OUTPUT_FEATURES = 2
 
 # Define weights
 # W shape: [output_features, input_features] = [2, 4]
-W = np.array([
-    [1.0, 0.5, -0.5, 2.0],   # First output neuron
-    [-1.0, 0.5, 1.5, -2.0]   # Second output neuron
-], dtype=np.float32)
+W = np.array(
+    [
+        [1.0, 0.5, -0.5, 2.0],  # First output neuron
+        [-1.0, 0.5, 1.5, -2.0],  # Second output neuron
+    ],
+    dtype=np.float32,
+)
 
 # b shape: [output_features] = [2]
 b = np.array([0.1, -0.1], dtype=np.float32)
@@ -48,34 +51,30 @@ print()
 device = DeviceRef("cpu")
 
 # Define input: [batch_size, input_features] = [1, 4]
-input_spec = TensorType(
-    DType.float32,
-    shape=[BATCH_SIZE, INPUT_FEATURES],
-    device=device
-)
+input_spec = TensorType(DType.float32, shape=[BATCH_SIZE, INPUT_FEATURES], device=device)
 
 # Build the computation graph
 with Graph("linear_layer_minimal", input_types=[input_spec]) as graph:
     # Get input tensor
     x = graph.inputs[0].tensor  # [1, 4]
-    
+
     # Create weight constants
     W_const = ops.constant(W, dtype=DType.float32, device=device)
     b_const = ops.constant(b, dtype=DType.float32, device=device)
-    
+
     # Linear transformation: x @ W^T
     # We need to transpose W from [2, 4] to [4, 2]
     W_transposed = ops.transpose(W_const, 0, 1)  # [4, 2]
-    
+
     # Matrix multiplication: [1, 4] @ [4, 2] = [1, 2]
     y = ops.matmul(x, W_transposed)
-    
+
     # Add bias: [1, 2] + [2] = [1, 2] (broadcasting)
     y = ops.add(y, b_const)
-    
+
     # Apply ReLU activation
     y = ops.relu(y)
-    
+
     # Mark output
     graph.output(y)
 
@@ -122,7 +121,7 @@ print("✓ Inference complete\n")
 print("=" * 60)
 print("RESULTS")
 print("=" * 60)
-print(f"Operation: y = relu(x @ W^T + b)")
+print("Operation: y = relu(x @ W^T + b)")
 print()
 print(f"Input shape:  {input_data_np.shape}")
 print(f"Weight shape: {W.shape}")
