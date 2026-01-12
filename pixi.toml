@@ -20,6 +20,7 @@ numpy = ">=2.4.0,<3"
 pytest = ">=9.0.2,<10"
 tqdm = ">=4.67.1,<5"
 scikit-learn = ">=1.6.1,<2"
+pre-commit = ">=4.5.1,<5"
 
 [pypi-dependencies]
 max-learning-python = { path = "src/python", editable = true }
@@ -58,6 +59,10 @@ test-all = { depends-on = ["test-python"] }  # Add test-mojo when implemented
 mojo-version = "mojo --version"
 mojo-format = "mojo format src/mojo/ tests/mojo/"
 mojo-check = "mojo check src/mojo/ tests/mojo/"
+
+# Code quality tasks
+pre-commit = "pre-commit run --all-files"
+pre-commit-install = "pre-commit install"
 
 # Cleanup
 clean-reports-md = "bash benchmarks/clean_reports.sh md"

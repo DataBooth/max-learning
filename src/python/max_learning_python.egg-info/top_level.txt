@@ -1,4 +1,5 @@
 max_cnn
 max_distilbert
 max_mlp
+max_rnn
 utils

@@ -14,6 +14,7 @@ max_learning_python.egg-info/top_level.txt
 max_mlp/__init__.py
 max_mlp/inference.py
 max_mlp/model.py
+max_rnn/model.py
 utils/__init__.py
 utils/benchmark_utils.py
 utils/paths.py
