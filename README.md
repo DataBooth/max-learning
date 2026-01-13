@@ -1,25 +1,35 @@
-# MAX Inference Experiments 🔥
+# MAX Learning 🔥
+
+**Learn the MAX Graph API through progressive, hands-on examples**
 
 ## Why This Repository?
 
-MAX (Modular Accelerated Xecution) is Modular's framework for high-performance ML inference, promising significant speedups over traditional frameworks. However, as a relatively new framework, there's limited community knowledge about how to actually build with it.
+MAX delivers impressive speedups for ML inference. The [official documentation](https://docs.modular.com/max/) provides excellent API references and tutorials. **This repository complements that documentation** by offering:
 
-This repository fills that gap by providing:
+✅ **Progressive learning path** - Six examples building from basics (`relu(x * 2 + 1)`) to production transformers  
+✅ **Learn by reading code** - Minimal versions show pure MAX Graph API without abstractions  
+✅ **Working implementations** - Tested, runnable code you can study and modify immediately  
+✅ **Real performance data** - Benchmarks with correctness validation (e.g., 5.58x speedup on DistilBERT)  
+✅ **Production insights** - What works, what doesn't, and why (including GPU findings)  
+✅ **Testing patterns** - 49 pytest tests showing how to validate MAX implementations  
 
-1. **Progressive learning path** - Six examples building from basics to production models
-2. **Minimal examples** - Self-contained code highlighting graph construction without abstractions
-3. **Working implementations** - Complete, tested code you can run immediately
-4. **Real benchmarks** - Actual performance measurements with correctness validation
-5. **Production insights** - What works, what doesn't, and why (including Apple Silicon GPU findings)
-6. **Testing patterns** - Comprehensive pytest suite showing how to validate MAX implementations
+**Who is this for?**  
+Developers who learn best by studying and running progressively complex examples, complementing the official tutorials.
 
-**Who is this for?** Anyone wanting to understand MAX Graph API through hands-on examples.
+**What you'll learn**:  
+How to build computational graphs with the MAX Python API - from simple element-wise operations through to production transformers.
+
+---
+
+**About this repository**: I'm learning MAX myself and documenting that journey through working examples. This isn't an authoritative guide - it's one developer's exploration of MAX, shared in the hope others find it useful. Corrections and improvements welcome!
 
 ## Status
 
 **Version**: 0.3.0  
-**Stage**: Community Release  
-**Last Updated**: January 2026
+**Stage**: Public Release (January 2026)  
+**Focus**: Python MAX Graph API examples
+
+> **Note on Mojo**: This repository focuses on the Python MAX Graph API, which is the current production path for building graphs. While Mojo MAX Graph API existed previously, it was [deprecated in May 2025](https://forum.modular.com/t/mojo-max-bindings/1499/3). See [examples/mojo/01_elementwise](examples/mojo/01_elementwise/) for details on the current state and architecture.
 
 ## Learning Path: Examples in Order
 
@@ -43,19 +53,19 @@ Each example includes both a **minimal version** (no abstractions, pure MAX Grap
 **Learn**: Production model loading, tokenisation, multi-layer architecture  
 **Performance**: **5.58x speedup** vs PyTorch on M1 CPU
 
-### 4️⃣ MLP Regression
+### 4️⃣ MLP Regression  
 **Path**: `examples/python/03_mlp_regression/`  
 **Model**: Multi-layer perceptron (3 hidden layers)  
 **Learn**: Sequential layers, housing price prediction  
 **Benchmarks**: MAX vs PyTorch comparison included
 
-### 5️⃣ CNN MNIST
+### 5️⃣ CNN MNIST  
 **Path**: `examples/python/04_cnn_mnist/`  
 **Model**: Convolutional neural network (2 conv + 2 dense layers)  
 **Learn**: Convolutions, pooling, flattening, digit classification  
 **Benchmarks**: MAX vs PyTorch comparison included
 
-### 6️⃣ RNN Forecast (WIP)
+### 6️⃣ RNN Forecast (WIP)  
 **Path**: `examples/python/05_rnn_forecast/`  
 **Status**: 🚧 Parked due to MAX Graph API limitations with sequence processing
 
@@ -205,12 +215,16 @@ pixi run clean-reports-all         # Remove all benchmark reports
 
 ## Sponsorship
 
-This project is sponsored by [DataBooth](https://www.databooth.com.au/posts/mojo) as part of our exploration of high-performance AI infrastructure with Mojo.
+This project is sponsored by [DataBooth](https://www.databooth.com.au/posts/mojo) as part of our exploration of high-performance AI infrastructure.
 
 ## Acknowledgements
 
-- Modular team for creating Mojo
-- Community contributions to mojo-toml and mojo-dotenv
+- **Modular team** for creating MAX and Mojo, and for their helpful responses on Discord
+- **MAX documentation** - particularly the [MLP tutorial](https://docs.modular.com/max/develop/build-an-mlp-block) which inspired example 04
+- **Community projects** - [mojo-toml](https://github.com/thatstoasty/mojo-toml) and [mojo-dotenv](https://github.com/thatstoasty/mojo-dotenv) used in the lexicon baseline
+- **Community feedback** on early versions helped shape the structure and focus
+
+See [docs/ACKNOWLEDGEMENTS.md](docs/ACKNOWLEDGEMENTS.md) for detailed attributions.
 
 ## Licence
 
