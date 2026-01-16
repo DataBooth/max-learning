@@ -35,6 +35,8 @@ How to build computational graphs with the MAX Python API - from simple element-
 
 Each example includes both a **minimal version** (no abstractions, pure MAX Graph API) and a **full version** (with configuration and helpers).
 
+> **Note**: Directory names (01_, 03_, 04_, 05_) are historical from development. Follow the emoji numbers 1️⃣→6️⃣ for the learning progression.
+
 ### 1️⃣ Element-wise Operations
 **Path**: `examples/python/01_elementwise/`  
 **Operation**: `y = relu(x * 2.0 + 1.0)`  
@@ -89,7 +91,6 @@ pixi run example-cnn               # 5️⃣ CNN MNIST classifier
 
 # Run tests (49 tests total)
 pixi run test-python               # Full pytest suite
-pixi run test-mojo                 # Mojo tests
 
 # Run benchmarks (generates MD + JSON + CSV reports)
 pixi run benchmark-elementwise     # 1️⃣ Element-wise: CPU vs GPU
@@ -131,7 +132,7 @@ pixi run clean-reports-all         # Remove all benchmark reports
 │   ├── max_*/                     # MAX implementations (distilbert, mlp, cnn, rnn)
 │   ├── utils/                     # Shared utilities (paths, benchmarks)
 │   └── pyproject.toml             # Package configuration
-├── src/mojo/                          # (Empty - ready for MAX Graph Mojo modules)
+├── src/mojo/                          # (Reserved for future if/when Mojo Graph API returns)
 ├── examples/mojo/
 │   └── lexicon_baseline/          # v0.1.0 pure Mojo baseline (non-MAX Graph)
 ├── examples/python/

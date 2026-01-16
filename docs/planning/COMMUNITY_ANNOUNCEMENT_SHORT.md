@@ -1,9 +1,9 @@
-# MAX Learning Repository - Short Announcement
+# Learning MAX Graph API Through Working Examples
+
+**Sharing my learning journey**: Six progressive examples from `relu(x * 2 + 1)` to production transformers
 
 **Repository:** https://github.com/DataBooth/max-learning  
 **Version:** 0.3.0
-
-A hands-on learning repository for Modular's MAX Engine, featuring six progressive examples from element-wise operations to transformer models.
 
 **Key Features:**
 - Minimal examples highlighting pure MAX Graph API without abstractions
