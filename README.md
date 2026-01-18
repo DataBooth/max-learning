@@ -229,4 +229,4 @@ See [docs/ACKNOWLEDGEMENTS.md](docs/ACKNOWLEDGEMENTS.md) for detailed attributio
 
 ## Licence
 
-MIT Licence - see LICENCE file for details
+Apache 2.0 Licence - see LICENSE file for details
