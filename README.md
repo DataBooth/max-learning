@@ -194,9 +194,12 @@ pixi run clean-reports-all         # Remove all benchmark reports
 
 ## Requirements
 
-- MAX 25.1.0 or later
-- Pixi package manager
-- Python 3.11+ (for MAX Python API)
+- **MAX/Mojo**: Version locked to `26.1.0.dev2026010718` in `pixi.toml`
+  - All examples tested against this version
+  - Version locked to prevent breaking API changes
+  - Update manually in `pixi.toml` when ready to modernise
+- **Pixi**: Package manager (required)
+- **Python**: 3.11+ (for MAX Python API)
 
 ## Key Dependencies
 

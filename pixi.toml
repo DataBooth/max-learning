@@ -9,7 +9,7 @@ version = "0.3.0"
 env = { MOJO_PATH = "$PIXI_PROJECT_ROOT/src:$HOME/code/github/databooth/mojo-toml/src:$HOME/code/github/databooth/mojo-dotenv/src" }
 
 [dependencies]
-modular = "*"
+modular = "==26.1.0.dev2026010718"  # Locked to prevent breaking changes
 transformers = ">=4.57.3,<5"
 pytorch = ">=2.9.1,<3"
 torchvision = ">=0.22.1,<1"
