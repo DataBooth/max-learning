@@ -1,8 +1,51 @@
 # Release Notes
 
+## v0.3.1 - MAX 26.2.0 Update (January 2026)
+
+**MAX/Mojo Version**: `26.2.0.dev2026012505` (locked)
+
+### What's New
+
+#### Breaking API Changes
+- **Tensor → Buffer rename**: Updated all `max.driver.Tensor` imports to `max.driver.Buffer`
+  - Runtime data handling now uses `Buffer` class
+  - Graph specifications still use `TensorType` (unchanged)
+  - All 49 tests passing with updated API
+
+#### New Features
+- **🎉 Apple Silicon GPU matmul support!**
+  - Linear layer operations now work on Apple Silicon GPU
+  - MAX nightly includes fallback path for matrix multiplication
+  - Previously blocked `ops.matmul` now functional on GPU
+  - Verified working: `pixi run python examples/python/02_linear_layer/linear_layer.py --device gpu`
+
+#### Tooling
+- **Automated version update script**: `scripts/update_max_version.py`
+  - Safely updates MAX to latest nightly with automatic rollback
+  - Runs full test suite before committing version change
+  - Saves detailed failure reports for breaking changes
+  - Documented in `scripts/README.md`
+
+### Requirements
+
+- MAX/Mojo: `26.2.0.dev2026012505` (locked in `pixi.toml`)
+- Pixi package manager
+- Python 3.11+
+
+### Migration from v0.3.0
+
+To update from v0.3.0:
+1. Replace `from max.driver import Tensor` with `from max.driver import Buffer`
+2. Replace `Tensor.from_numpy()` with `Buffer.from_numpy()`
+3. Keep `TensorType` imports unchanged
+
+---
+
 ## v0.3.0 - Public Release (January 2026)
 
 **MAX/Mojo Version**: `26.1.0.dev2026010718` (locked)
+
+**Status**: Superseded by v0.3.1
 
 ### What's New
 
@@ -38,7 +81,7 @@ Each example includes a minimal version showing pure MAX Graph API without abstr
 - **DistilBERT (M1 CPU)**: 5.58x faster than PyTorch (45.88ms vs 255.85ms)
 - **MLP Regression**: PyTorch 253x faster (honest reporting of both wins and losses)
 - **CNN MNIST**: PyTorch ~5x faster (both produce identical predictions)
-- **Apple Silicon GPU**: Element-wise ops working ✅, matmul kernel missing ❌
+- **Apple Silicon GPU**: Element-wise ops working ✅, matmul now working ✅
 
 ### Requirements
 
@@ -53,7 +96,6 @@ None - this is the initial public release.
 ### Known Limitations
 
 - RNN example parked due to MAX Graph API sequence processing limitations
-- Apple Silicon GPU matmul kernels not yet available
 - MAX slower than PyTorch on some workloads (MLP, CNN)
 
 ---
