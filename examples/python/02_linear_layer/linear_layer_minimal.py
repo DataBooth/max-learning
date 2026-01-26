@@ -15,7 +15,7 @@ Run:
 """
 
 import numpy as np
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -105,7 +105,7 @@ print("Running inference...")
 input_data_np = np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32)
 
 # Convert to MAX Tensor
-input_tensor = Tensor.from_numpy(input_data_np).to(device_obj)
+input_tensor = Buffer.from_numpy(input_data_np).to(device_obj)
 
 # Execute model
 output = model.execute(input_tensor)

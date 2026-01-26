@@ -197,7 +197,8 @@ pixi run clean-reports-all         # Remove all benchmark reports
 - **MAX/Mojo**: Version locked to `26.1.0.dev2026010718` in `pixi.toml`
   - All examples tested against this version
   - Version locked to prevent breaking API changes
-  - Update manually in `pixi.toml` when ready to modernise
+  - Use `python scripts/update_max_version.py` to safely test new versions
+  - Script automatically tests and rolls back if breaking changes detected
 - **Pixi**: Package manager (required)
 - **Python**: 3.11+ (for MAX Python API)
 

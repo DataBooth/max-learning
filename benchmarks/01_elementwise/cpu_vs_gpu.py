@@ -13,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import tomllib
-from max.driver import CPU, Accelerator, Tensor
+from max.driver import CPU, Accelerator, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -90,7 +90,7 @@ def benchmark_device(device_type: str, config: dict, input_data_np: np.ndarray):
         return None, error_msg
 
     # Prepare input
-    input_data = Tensor.from_numpy(input_data_np).to(device)
+    input_data = Buffer.from_numpy(input_data_np).to(device)
 
     # Warmup
     print(f"\nWarming up ({warmup} iterations)...")

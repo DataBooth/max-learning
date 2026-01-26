@@ -12,7 +12,7 @@ Run:
 import time
 
 import numpy as np
-from max.driver import CPU, Accelerator, Tensor
+from max.driver import CPU, Accelerator, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -56,7 +56,7 @@ def benchmark_size(device, device_type: str, size: int, iterations: int = 100, w
 
     # Prepare input
     input_data_np = np.random.randn(size).astype(np.float32)
-    input_data = Tensor.from_numpy(input_data_np).to(device)
+    input_data = Buffer.from_numpy(input_data_np).to(device)
 
     # Warmup
     for _ in range(warmup):
@@ -66,7 +66,7 @@ def benchmark_size(device, device_type: str, size: int, iterations: int = 100, w
     times = []
     for _ in range(iterations):
         start = time.perf_counter()
-        output = model.execute(input_data)
+        _ = model.execute(input_data)
         end = time.perf_counter()
         times.append((end - start) * 1000)
 

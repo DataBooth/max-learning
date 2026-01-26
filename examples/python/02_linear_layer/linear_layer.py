@@ -22,7 +22,7 @@ from pathlib import Path
 
 import numpy as np
 import tomllib
-from max.driver import CPU, Accelerator, Tensor
+from max.driver import CPU, Accelerator, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -145,7 +145,7 @@ def main():
     # 4. Prepare input
     print("4. Preparing input...")
     input_data_np = input_values.astype(np.float32)
-    input_data = Tensor.from_numpy(input_data_np).to(device)
+    input_data = Buffer.from_numpy(input_data_np).to(device)
     print(f"   Input shape: {input_data_np.shape}")
     print(f"   Input data: {input_data_np}\n")
 

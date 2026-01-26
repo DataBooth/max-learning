@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import tomllib
-from max.driver import CPU, Accelerator, Tensor
+from max.driver import CPU, Accelerator, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -104,7 +104,7 @@ def benchmark_device(device_type: str, config: dict):
 
     # Prepare input
     input_data_np = np.random.randn(batch_size, input_features).astype(np.float32)
-    input_data = Tensor.from_numpy(input_data_np).to(device)
+    input_data = Buffer.from_numpy(input_data_np).to(device)
 
     # Warmup
     print(f"\nWarming up ({warmup} iterations)...")
@@ -123,7 +123,7 @@ def benchmark_device(device_type: str, config: dict):
     try:
         for _ in tqdm(range(iterations), desc="Benchmark", unit="iter", ncols=80, mininterval=0.5):
             start = time.perf_counter()
-            output = model.execute(input_data)
+            _ = model.execute(input_data)
             end = time.perf_counter()
             times.append((end - start) * 1000)
     except Exception as e:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef
@@ -80,7 +80,7 @@ class MLPRegressionModel:
             sample = X[i : i + 1]  # Keep 2D shape [1, input_size]
 
             # Convert to MAX Tensor
-            X_tensor = Tensor.from_numpy(sample.astype(np.float32)).to(self.device)
+            X_tensor = Buffer.from_numpy(sample.astype(np.float32)).to(self.device)
 
             # Run inference
             output = self.model.execute(X_tensor)[0]

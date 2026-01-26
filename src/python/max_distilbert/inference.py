@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef
@@ -115,8 +115,8 @@ class DistilBertSentimentClassifier:
         )
 
         # Convert to MAX Tensors
-        input_ids = Tensor.from_numpy(inputs["input_ids"].astype(np.int64)).to(self.device)
-        attention_mask = Tensor.from_numpy(inputs["attention_mask"].astype(np.float32)).to(
+        input_ids = Buffer.from_numpy(inputs["input_ids"].astype(np.int64)).to(self.device)
+        attention_mask = Buffer.from_numpy(inputs["attention_mask"].astype(np.float32)).to(
             self.device
         )
 

@@ -19,7 +19,7 @@ from pathlib import Path
 
 import numpy as np
 import tomllib
-from max.driver import CPU, Accelerator, Tensor
+from max.driver import CPU, Accelerator, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -138,7 +138,7 @@ def main():
     if len(input_data_np) != input_size:
         print(f"   ✗ Input size mismatch: got {len(input_data_np)}, expected {input_size}\n")
         return
-    input_data = Tensor.from_numpy(input_data_np).to(device)
+    input_data = Buffer.from_numpy(input_data_np).to(device)
     print(f"   Input: {input_data_np}\n")
 
     # 5. Execute

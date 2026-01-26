@@ -12,7 +12,7 @@ example_path = get_examples_dir() / "01_elementwise"
 sys.path.insert(0, str(example_path))
 
 from elementwise import build_elementwise_graph
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.engine import InferenceSession
 
 
@@ -47,7 +47,7 @@ class TestElementwiseOperations:
 
         # Create test input
         input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         # Run inference
         output = model.execute(input_data)[0]
@@ -65,7 +65,7 @@ class TestElementwiseOperations:
 
         # Create test input
         input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         # Run inference
         output = model.execute(input_data)[0]
@@ -85,7 +85,7 @@ class TestElementwiseOperations:
 
         # Input that should produce negative pre-activation values
         input_data_np = np.array([-5.0, -5.0, -5.0, -5.0], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
@@ -104,7 +104,7 @@ class TestElementwiseOperations:
             model = session.load(graph)
 
             input_data_np = np.random.randn(size).astype(np.float32)
-            input_data = Tensor.from_numpy(input_data_np).to(device)
+            input_data = Buffer.from_numpy(input_data_np).to(device)
 
             output = model.execute(input_data)[0]
             output_np = output.to_numpy()
@@ -127,7 +127,7 @@ class TestElementwiseOperations:
             model = session.load(graph)
 
             input_data_np = np.array([1.0, -2.0, 3.0, -4.0], dtype=np.float32)
-            input_data = Tensor.from_numpy(input_data_np).to(device)
+            input_data = Buffer.from_numpy(input_data_np).to(device)
 
             output = model.execute(input_data)[0]
             output_np = output.to_numpy()
@@ -143,7 +143,7 @@ class TestElementwiseOperations:
         model = session.load(graph)
 
         input_data_np = np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
@@ -160,7 +160,7 @@ class TestElementwiseOperations:
         model = session.load(graph)
 
         input_data_np = np.zeros(self.size, dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()

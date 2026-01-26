@@ -12,7 +12,7 @@ Architecture:
 """
 
 import numpy as np
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -182,7 +182,7 @@ class RNNForecastModel:
             Predictions [batch, output_size]
         """
         # Convert to tensor
-        X_tensor = Tensor.from_numpy(X.astype(np.float32)).to(self.device)
+        X_tensor = Buffer.from_numpy(X.astype(np.float32)).to(self.device)
 
         # Run inference
         output = self.model.execute(X_tensor)

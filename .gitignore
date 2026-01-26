@@ -34,6 +34,10 @@ kgen*
 # Pixi
 .pixi/
 pixi.lock
+pixi.toml.backup
+
+# MAX version update test failures
+test_failure_*.txt
 
 # IDE
 .vscode/

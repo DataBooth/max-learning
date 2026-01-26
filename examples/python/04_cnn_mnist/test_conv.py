@@ -3,7 +3,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.dtype import DType
 from max.engine import InferenceSession
 from max.graph import DeviceRef, Graph, TensorType, ops
@@ -68,7 +68,7 @@ session = InferenceSession(devices=[device])
 model = session.load(graph)
 
 # Run
-input_tensor = Tensor.from_numpy(input_nhwc).to(device)
+input_tensor = Buffer.from_numpy(input_nhwc).to(device)
 output_max = model.execute(input_tensor)[0].to_numpy()
 
 print(f"Output shape: {output_max.shape} (NHWC)")

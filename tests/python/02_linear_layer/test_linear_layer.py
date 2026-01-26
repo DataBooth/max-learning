@@ -13,7 +13,7 @@ sys.path.insert(0, str(example_path))
 
 # Import directly to test the functions
 from linear_layer import build_linear_layer_graph
-from max.driver import CPU, Tensor
+from max.driver import CPU, Buffer
 from max.engine import InferenceSession
 
 
@@ -47,7 +47,7 @@ class TestLinearLayer:
 
         # Create test input
         input_data_np = np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         # Run inference
         output = model.execute(input_data)[0]
@@ -65,7 +65,7 @@ class TestLinearLayer:
 
         # Create test input
         input_data_np = np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         # Run inference
         output = model.execute(input_data)[0]
@@ -91,7 +91,7 @@ class TestLinearLayer:
         ]
 
         for input_data_np in test_inputs:
-            input_data = Tensor.from_numpy(input_data_np).to(device)
+            input_data = Buffer.from_numpy(input_data_np).to(device)
             output = model.execute(input_data)[0]
             output_np = output.to_numpy()
             expected = np.maximum(0, input_data_np @ self.W.T + self.b)
@@ -106,7 +106,7 @@ class TestLinearLayer:
 
         # Input that should produce negative pre-activation values
         input_data_np = np.array([[-5.0, -5.0, -5.0, -5.0]], dtype=np.float32)
-        input_data = Tensor.from_numpy(input_data_np).to(device)
+        input_data = Buffer.from_numpy(input_data_np).to(device)
 
         output = model.execute(input_data)[0]
         output_np = output.to_numpy()
